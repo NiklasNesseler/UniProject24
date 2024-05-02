@@ -9,7 +9,8 @@ public class BasicVertex extends BasicVertexTemplate {
 
     @Override
     public void initPosition(int row, int column) {
-
+        Position2D position2D = new Position2D(row, column);
+        setPosition(position2D);
     }
 
     @Override
