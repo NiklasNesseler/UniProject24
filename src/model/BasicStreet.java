@@ -8,8 +8,12 @@ public class BasicStreet extends BasicVertex{
 
     }
 
-    public void isDeadEnd(){
+//    public void isDeadEnd(){
+//
+//    }
 
+    public boolean isBasicDeadEnd() {
+        //TODO: Gibt dann true zurück, wenn es sich bei dem Knoten um ein Deadend handelt
     }
 
     public int getSpeedLimit() {
