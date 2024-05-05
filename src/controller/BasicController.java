@@ -5,6 +5,8 @@ import model.BasicMap;
 
 public class BasicController extends BasicControllerTemplate {
 
+    //TODO: Nichts. A9 erfüllt.
+
     public BasicController(int[][] baseData, int[][] valueData) {
         super(baseData, valueData);
     }

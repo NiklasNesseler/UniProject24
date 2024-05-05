@@ -14,34 +14,37 @@ public class BasicVertex extends BasicVertexTemplate {
         setPosition(position2D);
     }
 
-    //TODO: Gibt true zurück wenn das Objekt am Rand der Karte ist
     @Override
     public boolean isOnBound() {
-        return false;
+        //returns true if the vertex is on the edge of the map
+        return (getPosition().getRow() == 0 || getPosition().getRow() == getContainingMap().getVertexArray().length - 1 ||
+                getPosition().getColumn() == 0 || getPosition().getColumn() == getContainingMap().getVertexArray()[0].length - 1);
     }
 
-
-    //TODO: Gibt true zurück wenn das Objekt in der Kartenecke liegt
     @Override
     public boolean isOnCorner() {
-        return false;
+        //returns true if the vertex is in a corner of the map
+        return (getPosition().getRow() == 0 && getPosition().getColumn() == 0) ||
+               (getPosition().getRow() == 0 && getPosition().getColumn() == getContainingMap().getVertexArray()[0].length - 1) ||
+               (getPosition().getRow() == getContainingMap().getVertexArray().length - 1 && getPosition().getColumn() == 0) ||
+               (getPosition().getRow() == getContainingMap().getVertexArray().length - 1 && getPosition().getColumn() == getContainingMap().getVertexArray()[0].length - 1);
     }
 
-    //TODO: Gibt die Manhatten Distanz zwischen dem aufrufenden Knoten und Knoten v zurück
+
     @Override
     public int getBasicManhattanDistance(BasicVertex v) {
-        return 0;
+        //returns the shortest distance between our vertice and vertice v
+        return Math.abs(getPosition().getRow() - v.getPosition().getRow()) + Math.abs(getPosition().getColumn() - v.getPosition().getColumn());
     }
 
     //TODO: Gibt die Länge eines kürzesten Weges unter bestimmten Bedingungen zurück
     @Override
     public int getBasicDistance(BasicVertex v, int connectValue) {
-        return 0;
     }
 
     //TODO: Gibt true zurück, wenn der aufgerufene Knoten und Knoten v street connected sind
     @Override
     public boolean isBasicStreetConnectedTo(BasicVertex v) {
-        return false;
+
     }
 }
