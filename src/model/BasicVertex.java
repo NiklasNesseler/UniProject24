@@ -2,6 +2,8 @@ package model;
 
 import model.abstractClasses.BasicVertexTemplate;
 
+import java.util.*;
+
 public class BasicVertex extends BasicVertexTemplate {
     public BasicVertex(int row, int column, int value) {
         super(row, column, value);
@@ -37,9 +39,58 @@ public class BasicVertex extends BasicVertexTemplate {
         return Math.abs(getPosition().getRow() - v.getPosition().getRow()) + Math.abs(getPosition().getColumn() - v.getPosition().getColumn());
     }
 
-    //TODO: Gibt die Länge eines kürzesten Weges unter bestimmten Bedingungen zurück
     @Override
     public int getBasicDistance(BasicVertex v, int connectValue) {
+        Map<BasicVertex, Integer> distances = traverse(connectValue);
+
+        return distances.getOrDefault(v, -1);
+
+    }
+
+    public Map<BasicVertex, Integer> traverse(int requiredConnectValue) {
+        Queue<BasicVertex> q = new LinkedList<>();
+        Map<BasicVertex, Integer> distances = new HashMap<>();
+        Set<BasicVertex> visited = new HashSet<>();
+
+        q.add(this);
+        distances.put(this, 0);
+        visited.add(this);
+
+        while (!q.isEmpty()) {
+            BasicVertex currentVertex = q.poll();
+            int currentDistance = distances.get(currentVertex);
+
+            for (BasicVertex neighbor : currentVertex.getNeighbors()) {
+                if (!visited.contains(neighbor) && neighbor.getValue() == requiredConnectValue) {
+                    q.add(neighbor);
+                    distances.put(neighbor, currentDistance + 1);
+                    visited.add(neighbor);
+                }
+
+            }
+        }
+        return distances;
+    }
+    public List<BasicVertex> getNeighbors() {
+        List<BasicVertex> neighbours = new LinkedList<>();
+        int row = getPosition().getRow();
+        int column = getPosition().getColumn();
+        BasicVertex[][] map = getContainingMap().getVertexArray();
+
+        if (row > 0) {
+            neighbours.add(map[row - 1][column]);
+        }
+        if (row < map.length - 1) {
+            neighbours.add(map[row + 1][column]);
+        }
+        if (column > 0) {
+            neighbours.add(map[row][column - 1]);
+        }
+        if (column < map[0].length - 1) {
+            neighbours.add(map[row][column + 1]);
+        }
+
+        return neighbours;
     }
 
     //TODO: Gibt true zurück, wenn der aufgerufene Knoten und Knoten v street connected sind
