@@ -4,6 +4,14 @@ import model.abstractClasses.BasicVertexTemplate;
 
 import java.util.*;
 
+/**
+ * Die Klasse BasicVertex repräsentiert einen Knoten einer größeren Struktur,
+ * einer sogenannten BasicMap, ist. Diese Klasse erweitert BasicVertexTemplate und implementiert zusätzliche Funktionalitäten
+ * zur Interaktion mit anderen Knoten in der Karte.
+ *
+ * @author Niklas Nesseler
+ */
+
 public class BasicVertex extends BasicVertexTemplate {
     public BasicVertex(int row, int column, int value) {
         super(row, column, value);
@@ -92,10 +100,32 @@ public class BasicVertex extends BasicVertexTemplate {
 
         return neighbours;
     }
-
-    //TODO: Gibt true zurück, wenn der aufgerufene Knoten und Knoten v street connected sind
+    
     @Override
     public boolean isBasicStreetConnectedTo(BasicVertex v) {
+        if (!(v instanceof BasicStreet) && !(this instanceof BasicStreet)) {
+            return false;
+        }
+        Queue<BasicVertex> q = new LinkedList<>();
+        Set<BasicVertex> visited = new HashSet<>();
+        
+        q.add(this);
+        visited.add(this);
+        
+        while (!q.isEmpty()) {
+            BasicVertex current = q.poll();
+            if (current.equals(v)) {
+                return true;
+            }
+        }
+        
+        for (BasicVertex neighbour : getNeighbors()) {
+            if (!visited.contains(neighbour) && neighbour instanceof BasicStreet) {
+                q.add(neighbour);
+                visited.add(neighbour);
+            }
+        }
 
+        return false;
     }
 }

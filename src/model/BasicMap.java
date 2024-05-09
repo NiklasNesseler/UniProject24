@@ -5,6 +5,32 @@ import model.abstractClasses.BasicMapTemplate;
 import java.util.ArrayList;
 import java.util.Optional;
 
+/**
+ * Die Klasse BasicMap stellt eine Kartenstruktur dar, in der verschiedene Arten von Knoten
+ * wie Gebäude, Straßen und Grünflächen organisiert sind. Diese Klasse erbt von BasicMapTemplate
+ * und implementiert spezifische Funktionen für das Initialisieren und Verwalten der Knoten in der Karte.
+ *
+ * Die Klasse verwendet ein zweidimensionales Array von BasicVertex-Objekten, das als vertexArray bezeichnet wird.
+ * Jeder Knoten in diesem Array kann ein BasicVertex sein oder von BasicVertex abgeleitete Klassen wie BasicStreet,
+ * BasicBuilding oder BasicGreen. Diese Klassifizierung basiert auf den Daten, die im Konstruktor übergeben werden.
+ *
+ * <p>Methodenübersicht:</p>
+ * <ul>
+ *   <li>initVertexArray - Initialisiert das vertexArray basierend auf den übergebenen Basiskonfigurationsdaten.</li>
+ *   <li>putValuesToBasicMap - Füllt das vertexArray mit spezifischen Werten für jeden Knoten.</li>
+ *   <li>getBasicVertex - Gibt ein Optional-Objekt zurück, das ein BasicVertex an einer spezifischen Position enthält.</li>
+ *   <li>countBasicVerticesWithValue - Zählt Knoten eines bestimmten Werts.</li>
+ *   <li>countBasicBuildings, countBasicStreets, countBasicGreens - Zählen spezifische Typen von Knoten in der Karte.</li>
+ *   <li>isBasicPathOverStreets - Überprüft, ob eine Liste von Knoten einen gültigen Pfad über Straßen bildet.</li>
+ *   <li>isBasicPathByValue - Bestimmt, ob Knoten mit einem bestimmten Wert so angeordnet werden können, dass sie einen Pfad bilden.</li>
+ *   <li>hasValidBuildingPlacements - Überprüft, ob alle Gebäude gemäß den Regeln gültig platziert sind.</li>
+ *   <li>isValidBasicMap - Überprüft, ob die Karte insgesamt gültige Bedingungen erfüllt.</li>
+ * </ul>
+ *
+ *
+ * @author Niklas Nesseler
+ */
+
 public class BasicMap extends BasicMapTemplate {
     public BasicMap(int[][] baseData) {
         super(baseData);
@@ -15,10 +41,29 @@ public class BasicMap extends BasicMapTemplate {
     @Override
     public void initVertexArray(int[][] baseData) {
         //8.3 a)
-        BasicVertex[][] vertexArray = super.getVertexArray();
+        BasicVertex[][] vertexArray;
         vertexArray = new BasicVertex[baseData.length][baseData[0].length];
-        //TODO: 8.3 b) Verstehe ohne Spaß nicht was ihr hier von einem wollt. Formuliert das mal bitte anständig danke.
+        for (int i = 0; i < baseData.length; i++) {
+            for (int j = 0; j < baseData[i].length; j++) {
+                switch (baseData[i][j]) {
+                    case 1:
+                        vertexArray[i][j] = new BasicVertex(i, j, -1);
+                        break;
+                    case 2:
+                        vertexArray[i][j] = new BasicStreet(i, j, -1, -1);
+                        break;
+                    case 3:
+                        vertexArray[i][j] = new BasicBuilding(i, j, -1, -1);
+                        break;
+                    default:
+                        vertexArray[i][j] = new BasicGreen(i, j, -1);
+                        break;
+                }
 
+            }
+        }
+
+        super.setVertexArray(vertexArray);
 
     }
 
@@ -27,7 +72,7 @@ public class BasicMap extends BasicMapTemplate {
         //give the values to the vertex array
         for (int row = 0; row < getVertexArray().length; row++) {
             for (int column = 0; column < getVertexArray()[0].length; column++) {
-                getVertexArray()[row][column] = new BasicVertex(row, column, valueArray[row][column]);
+                getVertexArray()[row][column].setValue(valueArray[row][column]);
             }
         }
 
@@ -100,7 +145,7 @@ public class BasicMap extends BasicMapTemplate {
     @Override
     public boolean isBasicPathOverStreets(ArrayList<BasicVertex> vertexList) {
         //returns true if the whole path is a street except for the last one
-        if (vertexList == null || vertexList.size() == 0) {
+        if (vertexList == null || vertexList.isEmpty()) {
             return false;
         }
         for (int i = 0; i < vertexList.size() - 1; i++) {
