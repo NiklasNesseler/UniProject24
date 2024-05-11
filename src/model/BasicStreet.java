@@ -12,7 +12,7 @@ public class BasicStreet extends BasicVertex{
 
     public boolean isBasicDeadEnd() {
         //TODO: Gibt dann true zurück, wenn es sich bei dem Knoten um ein Deadend handelt
-        List<BasicVertex> neighbours = this.getNeighbors();
+        List<BasicVertex> neighbours = this.getNeighbours();
         int connectedStreets = 0;
         for (BasicVertex neighbour : neighbours) {
             if (neighbour instanceof BasicStreet) {

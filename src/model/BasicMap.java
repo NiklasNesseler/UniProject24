@@ -3,6 +3,7 @@ package model;
 import model.abstractClasses.BasicMapTemplate;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -55,8 +56,12 @@ public class BasicMap extends BasicMapTemplate {
                     case 3:
                         vertexArray[i][j] = new BasicBuilding(i, j, -1, -1);
                         break;
-                    default:
+                    case 4:
                         vertexArray[i][j] = new BasicGreen(i, j, -1);
+                        break;
+                    default:
+                        System.out.println("Ungültiger Wert in baseData an Position [" + i + "][" + j + "]");
+                        vertexArray[i][j] = new BasicVertex(i, j, -1);
                         break;
                 }
 
@@ -190,32 +195,40 @@ public class BasicMap extends BasicMapTemplate {
     @Override
     public boolean isValidBasicMap() {
         //returns true if all vertices are not null, all vertices have a value of at least 1, hasValidBuildingPlacements() returns true, and every street is connected
-        boolean isValid = true;
         for (BasicVertex[] row : getVertexArray()) {
             for (BasicVertex vertex : row) {
                 if (vertex == null || vertex.getValue() < 1) {
-                    isValid = false;
-                    break;
+                    return false;
                 }
             }
-            if (!isValid)
-                break;
         }
+        if (!hasValidBuildingPlacements()) {
+            return false;
+    }
+        return areAllStreetsConnected();
+    }
 
-        if (isValid && hasValidBuildingPlacements()) {
-            for (BasicVertex[] row : getVertexArray()) {
-                for (BasicVertex vertex : row) {
-                    if (!vertex.isBasicStreetConnectedTo(vertex)) {
-                        isValid = false;
-                        break;
+    private boolean areAllStreetsConnected() {
+        for (BasicVertex[] row : getVertexArray()) {
+            for (BasicVertex vertex : row) {
+                if (vertex instanceof BasicStreet) {
+                    if (!isConnectedToAnotherStreet(vertex)) {
+                        return false;
                     }
                 }
-                if (!isValid)
-                    break;
             }
-
         }
+        return true;
+    }
 
-        return isValid;
+    private boolean isConnectedToAnotherStreet(BasicVertex street) {
+        List<BasicVertex> neighbours = street.getNeighbours();
+
+        for (BasicVertex neighbour : neighbours) {
+            if (neighbour instanceof BasicStreet) {
+                return true;
+            }
+        }
+        return false;
     }
 }

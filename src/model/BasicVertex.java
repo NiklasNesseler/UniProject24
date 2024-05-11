@@ -68,7 +68,7 @@ public class BasicVertex extends BasicVertexTemplate {
             BasicVertex currentVertex = q.poll();
             int currentDistance = distances.get(currentVertex);
 
-            for (BasicVertex neighbor : currentVertex.getNeighbors()) {
+            for (BasicVertex neighbor : currentVertex.getNeighbours()) {
                 if (!visited.contains(neighbor) && neighbor.getValue() == requiredConnectValue) {
                     q.add(neighbor);
                     distances.put(neighbor, currentDistance + 1);
@@ -79,7 +79,7 @@ public class BasicVertex extends BasicVertexTemplate {
         }
         return distances;
     }
-    public List<BasicVertex> getNeighbors() {
+    public List<BasicVertex> getNeighbours() {
         List<BasicVertex> neighbours = new LinkedList<>();
         int row = getPosition().getRow();
         int column = getPosition().getColumn();
@@ -117,12 +117,12 @@ public class BasicVertex extends BasicVertexTemplate {
             if (current.equals(v)) {
                 return true;
             }
-        }
-        
-        for (BasicVertex neighbour : getNeighbors()) {
-            if (!visited.contains(neighbour) && neighbour instanceof BasicStreet) {
-                q.add(neighbour);
-                visited.add(neighbour);
+
+            for (BasicVertex neighbour : current.getNeighbours()) {
+                if (!visited.contains(neighbour) && neighbour instanceof BasicStreet) {
+                    q.add(neighbour);
+                    visited.add(neighbour);
+                }
             }
         }
 
