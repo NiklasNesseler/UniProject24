@@ -15,18 +15,6 @@ import java.util.Optional;
  * Jeder Knoten in diesem Array kann ein BasicVertex sein oder von BasicVertex abgeleitete Klassen wie BasicStreet,
  * BasicBuilding oder BasicGreen. Diese Klassifizierung basiert auf den Daten, die im Konstruktor übergeben werden.
  *
- * <p>Methodenübersicht:</p>
- * <ul>
- *   <li>initVertexArray - Initialisiert das vertexArray basierend auf den übergebenen Basiskonfigurationsdaten.</li>
- *   <li>putValuesToBasicMap - Füllt das vertexArray mit spezifischen Werten für jeden Knoten.</li>
- *   <li>getBasicVertex - Gibt ein Optional-Objekt zurück, das ein BasicVertex an einer spezifischen Position enthält.</li>
- *   <li>countBasicVerticesWithValue - Zählt Knoten eines bestimmten Werts.</li>
- *   <li>countBasicBuildings, countBasicStreets, countBasicGreens - Zählen spezifische Typen von Knoten in der Karte.</li>
- *   <li>isBasicPathOverStreets - Überprüft, ob eine Liste von Knoten einen gültigen Pfad über Straßen bildet.</li>
- *   <li>isBasicPathByValue - Bestimmt, ob Knoten mit einem bestimmten Wert so angeordnet werden können, dass sie einen Pfad bilden.</li>
- *   <li>hasValidBuildingPlacements - Überprüft, ob alle Gebäude gemäß den Regeln gültig platziert sind.</li>
- *   <li>isValidBasicMap - Überprüft, ob die Karte insgesamt gültige Bedingungen erfüllt.</li>
- * </ul>
  *
  *
  * @author Niklas Nesseler
@@ -73,7 +61,6 @@ public class BasicMap extends BasicMapTemplate {
 
     @Override
     public void putValuesToBasicMap(int[][] valueArray) {
-        //give the values to the vertex array
         for (int row = 0; row < getVertexArray().length; row++) {
             for (int column = 0; column < getVertexArray()[0].length; column++) {
                 getVertexArray()[row][column].setValue(valueArray[row][column]);
@@ -84,7 +71,6 @@ public class BasicMap extends BasicMapTemplate {
 
     @Override
     public Optional<BasicVertex> getBasicVertex(Position2D pos) {
-        //return Optional if the position exists
         if (pos.getRow() >= 0 && pos.getRow() < getVertexArray().length && pos.getColumn() >= 0 && pos.getColumn() < getVertexArray()[0].length) {
             return Optional.of(getVertexArray()[pos.getRow()][pos.getColumn()]);
         } else {
@@ -94,7 +80,6 @@ public class BasicMap extends BasicMapTemplate {
 
     @Override
     public int countBasicVerticesWithValue(int vertexValue) {
-        //count the number of BasicVertices with vertexValue as their value
         int count = 0;
         for (BasicVertex[] row : getVertexArray()) {
             for (BasicVertex vertex : row) {
@@ -108,7 +93,6 @@ public class BasicMap extends BasicMapTemplate {
 
     @Override
     public int countBasicBuildings() {
-        //count the number of BasicBuildings
         int count = 0;
         for (BasicVertex[] row : getVertexArray()) {
             for (BasicVertex vertex : row) {
@@ -148,7 +132,6 @@ public class BasicMap extends BasicMapTemplate {
 
     @Override
     public boolean isBasicPathOverStreets(ArrayList<BasicVertex> vertexList) {
-        //returns true if the whole path is a street except for the last one
         if (vertexList == null || vertexList.isEmpty()) {
             return false;
         }
@@ -165,8 +148,6 @@ public class BasicMap extends BasicMapTemplate {
 
     @Override
     public boolean isBasicPathByValue(int value) {
-        //returns true if it is possible to arrange vertices with the given value in a single path
-        //check if there is a path from one vertex with the given value to another with the same value
         for (BasicVertex[] row : getVertexArray()) {
             for (BasicVertex vertex : row) {
                 if (vertex.getValue() == value) {
@@ -183,7 +164,6 @@ public class BasicMap extends BasicMapTemplate {
 
     @Override
     public boolean hasValidBuildingPlacements() {
-        //returns true if there is no BasicBuilding object in the vertex array or if every BasicBuilding has at least one adjacent BasicStreet
         BasicVertex[][] vertexArray = getVertexArray();
 
         for (BasicVertex[] row : vertexArray) {
@@ -210,7 +190,6 @@ public class BasicMap extends BasicMapTemplate {
 
     @Override
     public boolean isValidBasicMap() {
-        //returns true if all vertices are not null, all vertices have a value of at least 1, hasValidBuildingPlacements() returns true, and every street is connected
         BasicVertex[][] vertexArray = getVertexArray();
 
         for (BasicVertex[] row : vertexArray) {

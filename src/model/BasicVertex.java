@@ -26,14 +26,12 @@ public class BasicVertex extends BasicVertexTemplate {
 
     @Override
     public boolean isOnBound() {
-        //returns true if the vertex is on the edge of the map
         return (getPosition().getRow() == 0 || getPosition().getRow() == getContainingMap().getVertexArray().length - 1 ||
                 getPosition().getColumn() == 0 || getPosition().getColumn() == getContainingMap().getVertexArray()[0].length - 1);
     }
 
     @Override
     public boolean isOnCorner() {
-        //returns true if the vertex is in a corner of the map
         return (getPosition().getRow() == 0 && getPosition().getColumn() == 0) ||
                (getPosition().getRow() == 0 && getPosition().getColumn() == getContainingMap().getVertexArray()[0].length - 1) ||
                (getPosition().getRow() == getContainingMap().getVertexArray().length - 1 && getPosition().getColumn() == 0) ||
@@ -43,7 +41,6 @@ public class BasicVertex extends BasicVertexTemplate {
 
     @Override
     public int getBasicManhattanDistance(BasicVertex v) {
-        //returns the shortest distance between our vertice and vertice v
         return Math.abs(getPosition().getRow() - v.getPosition().getRow()) + Math.abs(getPosition().getColumn() - v.getPosition().getColumn());
     }
 
