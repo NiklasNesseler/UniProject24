@@ -2,21 +2,23 @@ package controller;
 
 import model.*;
 
+import java.util.ArrayList;
+
 public class PP24_main {
 
 	public static void main(String[] args) {
 		//TODO: Insert class implementations
 
 		int[][] baseData = {
-				{2, 2, 2, 2},
-				{3, 3, 2, 4},
-				{1, 1, 2, 3}
+				{3, 2, 2, 2},
+				{1, 3, 3, 4},
+				{1, 1, 3, 2}
 		};
 
 		int[][] valueData = {
-				{10, 10, 10, 40},
-				{15, 25, 10, 45},
-				{5, 15, 10, 35}
+				{20, 20, 20, 40},
+				{15, 15, 20, 45},
+				{5, 15, 20, 35}
 		};
 
 
@@ -25,18 +27,37 @@ public class PP24_main {
 
 			BasicMap map = controller.getCompleteBasicMap();
 
-			// Test getBasicDistance
-			BasicVertex startVertex = map.getVertexArray()[0][0];  // Ein Beispielknoten
-			BasicVertex endVertex = map.getVertexArray()[2][2];    // Ein anderer Beispielknoten
-			int connectValue = 10; // Verbindungswert, z.B. basierend auf einem spezifischen Wert in valueData
-			int distance = startVertex.getBasicDistance(endVertex, connectValue);
-			System.out.println("Die Entfernung zwischen den gewählten Knoten beträgt: " + distance);
+			//isBasicPathOverStreets
+			ArrayList<BasicVertex> streetPath = new ArrayList<>();
+			streetPath.add(map.getVertexArray()[0][0]);
+			streetPath.add(map.getVertexArray()[0][3]);
+			streetPath.add(map.getVertexArray()[2][3]);
+			System.out.println("Sind die Straßen miteinander verbunden? " + map.isBasicPathOverStreets(streetPath));
 
-			// Test isBasicStreetConnectedTo
-			BasicVertex street1 = map.getVertexArray()[0][0]; // Angenommen dies ist ein BasicStreet
-			BasicVertex street2 = map.getVertexArray()[0][3]; // Ein anderer BasicStreet Knoten
-			boolean isConnected = street1.isBasicStreetConnectedTo(street2);
-			System.out.println("Sind die Straßen miteinander verbunden? " + isConnected);
+			//isBasicPathByValue
+//			int testValue = 20;
+//			System.out.println("isBasicPathByValue: " + map.isBasicPathByValue(testValue));
+//			testValue = 15;
+//			System.out.println("isBasicPathByValue: " + map.isBasicPathByValue(testValue));
+
+			//hasValidBuildingPlacements
+			System.out.println("hasValidBuildingPlacements: " + map.hasValidBuildingPlacements());
+
+			//isValidBasicMap
+			System.out.println("isValidBasicMap: " + map.isValidBasicMap());
+
+
+//			// Test getBasicDistance
+//			BasicVertex startVertex = map.getVertexArray()[0][0];  // Ein Beispielknoten
+//			BasicVertex endVertex = map.getVertexArray()[2][2];    // Ein anderer Beispielknoten
+//			int connectValue = 10; // Verbindungswert, z.B. basierend auf einem spezifischen Wert in valueData
+//			int distance = startVertex.getBasicDistance(endVertex, connectValue);
+//			System.out.println("Die Entfernung zwischen den gewählten Knoten beträgt: " + distance);
+//
+//			BasicVertex street1 = map.getVertexArray()[0][0];
+//			BasicVertex street2 = map.getVertexArray()[0][3];
+//			boolean isConnected = street1.isBasicStreetConnectedTo(street2);
+//			System.out.println("Sind die Straßen miteinander verbunden? " + isConnected);
 
 //			// Beispiel, um die gesetzten Werte zu überprüfen
 //			System.out.println("Wert an Position (0,1): " + map.getVertexArray()[0][1].getValue());
@@ -46,7 +67,7 @@ public class PP24_main {
 //				System.out.println("An der Position (" + pos.getRow() + ", " + pos.getColumn() + ") befindet sich ein Gebäude.");
 //			}
 //
-//			// Annahme, dass die Map 3x4 groß ist
+//
 //			BasicVertex cornerVertex = new BasicVertex(0, 0, 10); // Ecke oben links
 //			cornerVertex.setContainingMap(map);
 //			System.out.println("Ist der Vertex an der Ecke? " + cornerVertex.isOnCorner()); // Erwartet: true

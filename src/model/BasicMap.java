@@ -60,7 +60,6 @@ public class BasicMap extends BasicMapTemplate {
                         vertexArray[i][j] = new BasicGreen(i, j, -1);
                         break;
                     default:
-                        System.out.println("Ungültiger Wert in baseData an Position [" + i + "][" + j + "]");
                         vertexArray[i][j] = new BasicVertex(i, j, -1);
                         break;
                 }
@@ -154,12 +153,15 @@ public class BasicMap extends BasicMapTemplate {
             return false;
         }
         for (int i = 0; i < vertexList.size() - 1; i++) {
-            if (vertexList.get(i).isBasicStreetConnectedTo(vertexList.get(i + 1))) {
-                return true;
+            BasicVertex current = vertexList.get(i);
+            BasicVertex next = vertexList.get(i + 1);
+                if (!current.isBasicStreetConnectedTo(next)) {
+                    return false;
+                }
             }
+
+            return true;
         }
-        return false;
-    }
 
     @Override
     public boolean isBasicPathByValue(int value) {
@@ -182,20 +184,36 @@ public class BasicMap extends BasicMapTemplate {
     @Override
     public boolean hasValidBuildingPlacements() {
         //returns true if there is no BasicBuilding object in the vertex array or if every BasicBuilding has at least one adjacent BasicStreet
-        for (BasicVertex[] row : getVertexArray()) {
+        BasicVertex[][] vertexArray = getVertexArray();
+
+        for (BasicVertex[] row : vertexArray) {
             for (BasicVertex vertex : row) {
-                if (!(vertex instanceof BasicBuilding) || vertex.isBasicStreetConnectedTo(vertex)) {
-                    return true;
+                if (vertex instanceof BasicBuilding) {
+                    boolean hasAdjacentStreets = false;
+                    for (BasicVertex neighbour : vertex.getNeighbours()) {
+                        if (neighbour instanceof BasicStreet) {
+                            hasAdjacentStreets = true;
+                            break;
+                        }
+                    }
+                    if (!hasAdjacentStreets) {
+                        return false;
+                    }
+                }
                 }
             }
+
+            return true;
         }
-        return false;
-    }
+
+
 
     @Override
     public boolean isValidBasicMap() {
         //returns true if all vertices are not null, all vertices have a value of at least 1, hasValidBuildingPlacements() returns true, and every street is connected
-        for (BasicVertex[] row : getVertexArray()) {
+        BasicVertex[][] vertexArray = getVertexArray();
+
+        for (BasicVertex[] row : vertexArray) {
             for (BasicVertex vertex : row) {
                 if (vertex == null || vertex.getValue() < 1) {
                     return false;
