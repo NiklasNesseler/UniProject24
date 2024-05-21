@@ -5,7 +5,6 @@ package model;
  * Diese Klasse erbt von BasicVertex und nutzt dessen Attribute und Methoden,
  * um die Position und den Wert der Grünfläche zu definieren und zu verwalten.
  *
- * @author Niklas Nesseler
  */
 
 public class BasicGreen extends BasicVertex{

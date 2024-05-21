@@ -2,9 +2,7 @@ package model;
 
 import model.abstractClasses.BasicMapTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Die Klasse BasicMap stellt eine Kartenstruktur dar, in der verschiedene Arten von Knoten
@@ -17,7 +15,6 @@ import java.util.Optional;
  *
  *
  *
- * @author Niklas Nesseler
  */
 
 public class BasicMap extends BasicMapTemplate {
@@ -146,21 +143,68 @@ public class BasicMap extends BasicMapTemplate {
             return true;
         }
 
-    @Override
-    public boolean isBasicPathByValue(int value) {
-        for (BasicVertex[] row : getVertexArray()) {
-            for (BasicVertex vertex : row) {
-                if (vertex.getValue() == value) {
-                    for (BasicVertex otherVertex : row) {
-                        if (otherVertex.getValue() == value && vertex.getBasicManhattanDistance(otherVertex) == 1) {
-                            return true;
-                        }
+
+        @Override
+        public boolean isBasicPathByValue(int value) {
+            List<BasicVertex> verticesWithValue = new ArrayList<>();
+            for (BasicVertex[] row : getVertexArray()) {
+                for (BasicVertex vertex : row) {
+                    if (vertex.getValue() == value) {
+                        verticesWithValue.add(vertex);
+                        //System.out.println("Vertex with value: " + value + " added to list: " + vertex);
                     }
                 }
             }
+            if (verticesWithValue.isEmpty())
+                return false;
+
+            Set<BasicVertex> visited = new HashSet<>();
+            Queue<BasicVertex> q = new LinkedList<>();
+            q.add(verticesWithValue.get(0));
+            visited.add(verticesWithValue.get(0));
+
+            //BFS
+            while (!q.isEmpty()) {
+                BasicVertex current = q.poll();
+                visited.add(current);
+//                System.out.println("Current Vertex: " + current);
+                boolean hasNeighbours = false;
+                for (BasicVertex neighbour : current.getNeighbours()) {
+//                    System.out.println("Checking Neighbour: " + neighbour + " with value: " + neighbour.getValue());
+                    if (neighbour.getValue() == value && !visited.contains(neighbour)) {
+//                        visited.add(neighbour);
+                        q.add(neighbour);
+                        hasNeighbours = true;
+//                        System.out.println("Neighbour added to queue: " + neighbour);
+                    } else {
+//                        System.out.println("Neighbour NOT added - Value: " + neighbour.getValue() + ", Visited: " + visited.contains(neighbour));
+                    }
+                }
+
+                if (!hasNeighbours) {
+                    break;
+                }
+            }
+
+//            System.out.println("Visited Vertices: " + visited.size() + " Expected: " + verticesWithValue.size());
+            return visited.size() == verticesWithValue.size();
         }
-        return false;
-    }
+
+//    @Override
+//    public boolean isBasicPathByValue(int value) {
+//        for (BasicVertex[] row : getVertexArray()) {
+//            for (BasicVertex vertex : row) {
+//                if (vertex.getValue() == value) {
+//                    for (BasicVertex otherVertex : row) {
+//                        if (otherVertex.getValue() == value && vertex.getBasicManhattanDistance(otherVertex) == 1) {
+//                            return true;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return false;
+//    }
 
     @Override
     public boolean hasValidBuildingPlacements() {

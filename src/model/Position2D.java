@@ -11,7 +11,6 @@ import model.abstractClasses.Position2DTemplate;
  * Diese Klasse wird hauptsächlich verwendet, um eine spezifische Position innerhalb einer
  * Map zu definieren und zu verwalten.
  *
- * @author Niklas Nesseler
  */
 
 public class Position2D extends Position2DTemplate {

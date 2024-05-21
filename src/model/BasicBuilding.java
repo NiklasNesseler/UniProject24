@@ -6,7 +6,6 @@ public class BasicBuilding extends BasicVertex{
      * steht als Knoten im graphbasierten Kontext und erbt grundlegende Eigenschaften von BasicVertex.
      * BasicBuilding speichert zusätzliche Informationen für Gebäude, wie die Höhe.
      *
-     * @author Niklas Nesseler
      */
     private int height;
     /**

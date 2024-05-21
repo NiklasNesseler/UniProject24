@@ -9,7 +9,6 @@ import java.util.*;
  * einer sogenannten BasicMap, ist. Diese Klasse erweitert BasicVertexTemplate und implementiert zusätzliche Funktionalitäten
  * zur Interaktion mit anderen Knoten in der Karte.
  *
- * @author Niklas Nesseler
  */
 
 public class BasicVertex extends BasicVertexTemplate {
@@ -77,27 +76,32 @@ public class BasicVertex extends BasicVertexTemplate {
         return distances;
     }
     public List<BasicVertex> getNeighbours() {
-        List<BasicVertex> neighbours = new LinkedList<>();
+        List<BasicVertex> neighbours = new ArrayList<>();
         int row = getPosition().getRow();
         int column = getPosition().getColumn();
         BasicVertex[][] map = getContainingMap().getVertexArray();
 
         if (row > 0) {
             neighbours.add(map[row - 1][column]);
+            //System.out.println("North Neighbor: Row " + (row-1) + " Column " + column);
         }
         if (row < map.length - 1) {
             neighbours.add(map[row + 1][column]);
+            //System.out.println("South Neighbor: Row " + (row+1) + " Column " + column);
         }
         if (column > 0) {
             neighbours.add(map[row][column - 1]);
+            //System.out.println("West Neighbor: Row " + row + " Column " + (column-1));
         }
         if (column < map[0].length - 1) {
             neighbours.add(map[row][column + 1]);
+            //System.out.println("East Neighbor: Row " + row + " Column " + (column+1));
         }
 
         return neighbours;
     }
-    
+
+
     @Override
     public boolean isBasicStreetConnectedTo(BasicVertex v) {
         if (!(v instanceof BasicStreet) && !(this instanceof BasicStreet)) {
