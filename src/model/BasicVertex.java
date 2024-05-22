@@ -43,6 +43,7 @@ public class BasicVertex extends BasicVertexTemplate {
         return Math.abs(getPosition().getRow() - v.getPosition().getRow()) + Math.abs(getPosition().getColumn() - v.getPosition().getColumn());
     }
 
+    //TODO: Check if we re on the correct value in the first place
     @Override
     public int getBasicDistance(BasicVertex v, int connectValue) {
         Map<BasicVertex, Integer> distances = traverse(connectValue);
@@ -104,7 +105,7 @@ public class BasicVertex extends BasicVertexTemplate {
 
     @Override
     public boolean isBasicStreetConnectedTo(BasicVertex v) {
-        if (!(v instanceof BasicStreet) && !(this instanceof BasicStreet)) {
+        if (v == null) {
             return false;
         }
         Queue<BasicVertex> q = new LinkedList<>();
@@ -115,14 +116,15 @@ public class BasicVertex extends BasicVertexTemplate {
         
         while (!q.isEmpty()) {
             BasicVertex current = q.poll();
+            visited.add(current);
             if (current.equals(v)) {
                 return true;
             }
 
             for (BasicVertex neighbour : current.getNeighbours()) {
-                if (!visited.contains(neighbour) && neighbour instanceof BasicStreet) {
+                if (!visited.contains(neighbour) && (neighbour instanceof BasicStreet || neighbour.equals(v))) {
                     q.add(neighbour);
-                    visited.add(neighbour);
+
                 }
             }
         }

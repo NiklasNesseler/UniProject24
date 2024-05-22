@@ -132,15 +132,41 @@ public class BasicMap extends BasicMapTemplate {
         if (vertexList == null || vertexList.isEmpty()) {
             return false;
         }
-        for (int i = 0; i < vertexList.size() - 1; i++) {
+
+        int size = vertexList.size();
+
+        BasicVertex first = vertexList.get(0);
+        BasicVertex last = vertexList.get(size - 1);
+
+        if (size < 3) {
+            return false;
+        }
+
+        if (!(isValidEndVertex(first) &&isValidEndVertex(last))) {
+            return false;
+
+        }
+        for (int i = 1; i < size - 1; i++) {
+            BasicVertex current = vertexList.get(i);
+            if (!(current instanceof BasicStreet)) {
+                return false;
+            }
+        }
+
+        for (int i = 0; i < size - 1; i++) {
             BasicVertex current = vertexList.get(i);
             BasicVertex next = vertexList.get(i + 1);
-                if (!current.isBasicStreetConnectedTo(next)) {
-                    return false;
-                }
+            if (current.equals(next) ||!current.isBasicStreetConnectedTo(next)) {
+                return false;
             }
+        }
+
 
             return true;
+        }
+
+        private boolean isValidEndVertex(BasicVertex vertex) {
+            return vertex instanceof BasicStreet || vertex instanceof BasicGreen || vertex instanceof BasicBuilding;
         }
 
 
@@ -151,7 +177,6 @@ public class BasicMap extends BasicMapTemplate {
                 for (BasicVertex vertex : row) {
                     if (vertex.getValue() == value) {
                         verticesWithValue.add(vertex);
-                        //System.out.println("Vertex with value: " + value + " added to list: " + vertex);
                     }
                 }
             }
@@ -167,17 +192,11 @@ public class BasicMap extends BasicMapTemplate {
             while (!q.isEmpty()) {
                 BasicVertex current = q.poll();
                 visited.add(current);
-//                System.out.println("Current Vertex: " + current);
                 boolean hasNeighbours = false;
                 for (BasicVertex neighbour : current.getNeighbours()) {
-//                    System.out.println("Checking Neighbour: " + neighbour + " with value: " + neighbour.getValue());
                     if (neighbour.getValue() == value && !visited.contains(neighbour)) {
-//                        visited.add(neighbour);
                         q.add(neighbour);
                         hasNeighbours = true;
-//                        System.out.println("Neighbour added to queue: " + neighbour);
-                    } else {
-//                        System.out.println("Neighbour NOT added - Value: " + neighbour.getValue() + ", Visited: " + visited.contains(neighbour));
                     }
                 }
 
@@ -185,26 +204,9 @@ public class BasicMap extends BasicMapTemplate {
                     break;
                 }
             }
-
-//            System.out.println("Visited Vertices: " + visited.size() + " Expected: " + verticesWithValue.size());
             return visited.size() == verticesWithValue.size();
         }
 
-//    @Override
-//    public boolean isBasicPathByValue(int value) {
-//        for (BasicVertex[] row : getVertexArray()) {
-//            for (BasicVertex vertex : row) {
-//                if (vertex.getValue() == value) {
-//                    for (BasicVertex otherVertex : row) {
-//                        if (otherVertex.getValue() == value && vertex.getBasicManhattanDistance(otherVertex) == 1) {
-//                            return true;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
 
     @Override
     public boolean hasValidBuildingPlacements() {
