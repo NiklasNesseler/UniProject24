@@ -129,7 +129,7 @@ public class BasicMap extends BasicMapTemplate {
 
     @Override
     public boolean isBasicPathOverStreets(ArrayList<BasicVertex> vertexList) {
-        if (vertexList == null || vertexList.isEmpty()) {
+        if (vertexList == null || vertexList.isEmpty() || vertexList.size() < 3) {
             return false;
         }
 
@@ -138,27 +138,41 @@ public class BasicMap extends BasicMapTemplate {
         BasicVertex first = vertexList.get(0);
         BasicVertex last = vertexList.get(size - 1);
 
-        if (size < 3) {
-            return false;
-        }
 
         if (!(isValidEndVertex(first) &&isValidEndVertex(last))) {
             return false;
 
         }
-        for (int i = 1; i < size - 1; i++) {
-            BasicVertex current = vertexList.get(i);
-            if (!(current instanceof BasicStreet)) {
-                return false;
-            }
-        }
+
+
+
+//        for (int i = 1; i < size - 1; i++) {
+//            BasicVertex current = vertexList.get(i);
+//            if (!(current instanceof BasicStreet)) {
+//                return false;
+//            }
+//        }
+
+        Set<BasicVertex> visited = new HashSet<>();
+        visited.add(first);
 
         for (int i = 0; i < size - 1; i++) {
+
             BasicVertex current = vertexList.get(i);
             BasicVertex next = vertexList.get(i + 1);
-            if (current.equals(next) ||!current.isBasicStreetConnectedTo(next)) {
+            visited.add(current);
+            if (i != 0 && visited.contains(next) && !(i == size - 2 && next == first && first == last))  {
                 return false;
             }
+
+            if (!current.isBasicStreetConnectedTo(next)) {
+                return false;
+            }
+
+            if (i > 0 && i < vertexList.size() - 1 && !(current instanceof BasicStreet)) {
+                return false;
+            }
+
         }
 
 

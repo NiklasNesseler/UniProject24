@@ -43,7 +43,6 @@ public class BasicVertex extends BasicVertexTemplate {
         return Math.abs(getPosition().getRow() - v.getPosition().getRow()) + Math.abs(getPosition().getColumn() - v.getPosition().getColumn());
     }
 
-    //TODO: Check if we re on the correct value in the first place
     @Override
     public int getBasicDistance(BasicVertex v, int connectValue) {
         Map<BasicVertex, Integer> distances = traverse(connectValue);
@@ -53,8 +52,14 @@ public class BasicVertex extends BasicVertexTemplate {
     }
 
     public Map<BasicVertex, Integer> traverse(int requiredConnectValue) {
-        Queue<BasicVertex> q = new LinkedList<>();
         Map<BasicVertex, Integer> distances = new HashMap<>();
+
+        if (this.getValue() != requiredConnectValue) {
+            return distances;
+        }
+
+
+        Queue<BasicVertex> q = new LinkedList<>();
         Set<BasicVertex> visited = new HashSet<>();
 
         q.add(this);
@@ -84,19 +89,15 @@ public class BasicVertex extends BasicVertexTemplate {
 
         if (row > 0) {
             neighbours.add(map[row - 1][column]);
-            //System.out.println("North Neighbor: Row " + (row-1) + " Column " + column);
         }
         if (row < map.length - 1) {
             neighbours.add(map[row + 1][column]);
-            //System.out.println("South Neighbor: Row " + (row+1) + " Column " + column);
         }
         if (column > 0) {
             neighbours.add(map[row][column - 1]);
-            //System.out.println("West Neighbor: Row " + row + " Column " + (column-1));
         }
         if (column < map[0].length - 1) {
             neighbours.add(map[row][column + 1]);
-            //System.out.println("East Neighbor: Row " + row + " Column " + (column+1));
         }
 
         return neighbours;
