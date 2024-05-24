@@ -144,15 +144,6 @@ public class BasicMap extends BasicMapTemplate {
 
         }
 
-
-
-//        for (int i = 1; i < size - 1; i++) {
-//            BasicVertex current = vertexList.get(i);
-//            if (!(current instanceof BasicStreet)) {
-//                return false;
-//            }
-//        }
-
         Set<BasicVertex> visited = new HashSet<>();
         visited.add(first);
 
@@ -160,19 +151,18 @@ public class BasicMap extends BasicMapTemplate {
 
             BasicVertex current = vertexList.get(i);
             BasicVertex next = vertexList.get(i + 1);
-            visited.add(current);
-            if (i != 0 && visited.contains(next) && !(i == size - 2 && next == first && first == last))  {
+            if (visited.contains(next)) {
                 return false;
             }
 
-            if (!current.isBasicStreetConnectedTo(next)) {
+            if (!current.isBasicStreetConnectedTo(next, visited)) {
                 return false;
             }
 
             if (i > 0 && i < vertexList.size() - 1 && !(current instanceof BasicStreet)) {
                 return false;
             }
-
+            visited.add(current);
         }
 
 

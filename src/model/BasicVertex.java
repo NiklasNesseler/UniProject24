@@ -106,15 +106,19 @@ public class BasicVertex extends BasicVertexTemplate {
 
     @Override
     public boolean isBasicStreetConnectedTo(BasicVertex v) {
+        return isBasicStreetConnectedTo(v, new HashSet<>());
+    }
+
+    public boolean isBasicStreetConnectedTo(BasicVertex v, Set <BasicVertex> blackList) {
         if (v == null) {
             return false;
         }
         Queue<BasicVertex> q = new LinkedList<>();
         Set<BasicVertex> visited = new HashSet<>();
-        
+
         q.add(this);
         visited.add(this);
-        
+
         while (!q.isEmpty()) {
             BasicVertex current = q.poll();
             visited.add(current);
@@ -123,7 +127,7 @@ public class BasicVertex extends BasicVertexTemplate {
             }
 
             for (BasicVertex neighbour : current.getNeighbours()) {
-                if (!visited.contains(neighbour) && (neighbour instanceof BasicStreet || neighbour.equals(v))) {
+                if (!visited.contains(neighbour) && (neighbour instanceof BasicStreet || neighbour.equals(v)) && !blackList.contains(neighbour)) {
                     q.add(neighbour);
 
                 }
