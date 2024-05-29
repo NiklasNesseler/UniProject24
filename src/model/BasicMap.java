@@ -127,9 +127,25 @@ public class BasicMap extends BasicMapTemplate {
         return count;
     }
 
+
+    public boolean areAllVerticesConnected(ArrayList<BasicVertex> vertexList){
+        for (int i = 0; i < vertexList.size() - 1; i++) {
+            BasicVertex current = vertexList.get(i);
+            BasicVertex next = vertexList.get(i + 1);
+            if (current.getBasicManhattanDistance(next) != 1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     public boolean isBasicPathOverStreets(ArrayList<BasicVertex> vertexList) {
         if (vertexList == null || vertexList.isEmpty() || vertexList.size() < 3) {
+            return false;
+        }
+
+        if (!areAllVerticesConnected(vertexList)) {
             return false;
         }
 
