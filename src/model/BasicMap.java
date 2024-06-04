@@ -189,7 +189,6 @@ public class BasicMap extends BasicMapTemplate {
             return vertex instanceof BasicStreet || vertex instanceof BasicGreen || vertex instanceof BasicBuilding;
         }
 
-
         @Override
         public boolean isBasicPathByValue(int value) {
             List<BasicVertex> verticesWithValue = new ArrayList<>();
@@ -204,19 +203,23 @@ public class BasicMap extends BasicMapTemplate {
                 return false;
 
             Set<BasicVertex> visited = new HashSet<>();
-            Queue<BasicVertex> q = new LinkedList<>();
-            q.add(verticesWithValue.get(0));
-            visited.add(verticesWithValue.get(0));
+            Stack<BasicVertex> stack = new Stack<>();
+            stack.push(verticesWithValue.getFirst());
+            visited.add(verticesWithValue.getFirst());
 
-            //BFS
-            while (!q.isEmpty()) {
-                BasicVertex current = q.poll();
+            //DFS
+            while (!stack.isEmpty()) {
+                BasicVertex current = stack.pop();
+
+
                 visited.add(current);
                 boolean hasNeighbours = false;
                 for (BasicVertex neighbour : current.getNeighbours()) {
                     if (neighbour.getValue() == value && !visited.contains(neighbour)) {
-                        q.add(neighbour);
+                        stack.push(neighbour);
+
                         hasNeighbours = true;
+
                     }
                 }
 
