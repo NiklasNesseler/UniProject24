@@ -22,7 +22,7 @@ public abstract class AdvancedVertex extends BasicVertex {
         }
     }
 
-    private void rotate90() {
+    void rotate90() {
         int n = parts.length;
         boolean[][] rotated = new boolean[n][n];
 
