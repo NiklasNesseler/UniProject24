@@ -32,7 +32,7 @@ public class AdvancedMap{
         }
     }
 
-    void buildAdvancedStreets(int[][] streetCodes) {
+    public void buildAdvancedStreets(int[][] streetCodes) {
         for (int i = 0; i < streetCodes.length; i++) {
             for (int j = 0; j < streetCodes[i].length; j++) {
                 AdvancedVertex vertex = advancedVertexArray[i][j];
@@ -67,6 +67,7 @@ public class AdvancedMap{
             }
         }
     }
+
 
     public AdvancedVertex[][] getAdvancedVertexArray() {
         return advancedVertexArray;
