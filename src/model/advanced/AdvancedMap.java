@@ -2,6 +2,11 @@ package model.advanced;
 
 import model.*;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
 public class AdvancedMap{
     private AdvancedVertex[][] advancedVertexArray;
 
@@ -67,6 +72,34 @@ public class AdvancedMap{
             }
         }
     }
+
+    boolean isAdvancedPath(ArrayList<AdvancedStreet> streetList) {
+        if (streetList == null || streetList.isEmpty() || streetList.size() < 3) {
+            return false;
+        }
+
+        AdvancedStreet first = streetList.getFirst();
+        AdvancedStreet last = streetList.getLast();
+
+        Set<AdvancedStreet> visited = new HashSet<>();
+        visited.add(first);
+
+        for (int i = 0; i < streetList.size() - 1; i++) {
+            AdvancedStreet current = streetList.get(i);
+            AdvancedStreet next = streetList.get(i + 1);
+            if (visited.contains(next)) {
+                return false;
+            }
+
+            if (!current.isAdvancedStreetConnectedTo(next, visited)) {
+                return false;
+            }
+            visited.add(next);
+        }
+        return true;
+    }
+
+
 
 
     public AdvancedVertex[][] getAdvancedVertexArray() {

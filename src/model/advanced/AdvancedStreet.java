@@ -1,5 +1,13 @@
 package model.advanced;
 
+import model.BasicStreet;
+import model.BasicVertex;
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
+
 public class AdvancedStreet extends AdvancedVertex {
     public enum StreetTypes {
         DUMMY,
@@ -63,6 +71,36 @@ public class AdvancedStreet extends AdvancedVertex {
                 break;
         }
     }
+
+    public boolean isAdvancedStreetConnectedTo(AdvancedVertex v, Set<AdvancedStreet> blackList){
+        if (v == null) {
+            return false;
+        }
+        Queue<BasicVertex> q = new LinkedList<>();
+        Set<BasicVertex> visited = new HashSet<>();
+
+        q.add(this);
+        visited.add(this);
+
+        while (!q.isEmpty()) {
+            BasicVertex current = q.poll();
+            visited.add(current);
+            if (current.equals(v)) {
+                return true;
+            }
+
+            for (BasicVertex neighbour : current.getNeighbours()) {
+                if (!visited.contains(neighbour) && (neighbour instanceof BasicStreet || neighbour.equals(v)) && !blackList.contains(neighbour)) {
+                    q.add(neighbour);
+
+                }
+            }
+        }
+
+        return false;
+    }
+
+
 
     public StreetTypes getType() {
         return type;

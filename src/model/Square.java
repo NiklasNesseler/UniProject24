@@ -1,6 +1,8 @@
 package model;
 
 import model.abstractClasses.DensityChecker;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class Square implements DensityChecker, Comparable<Square> {
@@ -55,10 +57,6 @@ public class Square implements DensityChecker, Comparable<Square> {
         }
     }
 
-    @Override
-    public void checkDensity() {
-
-    }
 
     private int countStreetVertices() {
         int count = 0;
@@ -71,4 +69,28 @@ public class Square implements DensityChecker, Comparable<Square> {
 
     }
 
+    @Override
+    public boolean isSparse() {
+        return countStreetVertices() <= 3;
+    }
+
+    @Override
+    public boolean isBasicStreetConnectedMap() {
+        return false;
+    }
+
+    @Override
+    public int countCommonVertices(ArrayList<BasicVertex> x, ArrayList<BasicVertex> y) {
+        return 0;
+    }
+
+    @Override
+    public boolean isSubtrip(ArrayList<BasicVertex> trip, ArrayList<BasicVertex> subtrip) {
+        return false;
+    }
+
+    @Override
+    public boolean isConnectedByValue(int connectValue) {
+        return false;
+    }
 }

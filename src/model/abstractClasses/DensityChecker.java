@@ -1,5 +1,19 @@
 package model.abstractClasses;
 
+import model.BasicVertex;
+import model.Square;
+
+import java.util.ArrayList;
+import java.util.TreeSet;
+
 public interface DensityChecker {
-    void checkDensity();
+
+
+
+    boolean isSparse();
+    boolean isBasicStreetConnectedMap();
+    int countCommonVertices(ArrayList<BasicVertex> x, ArrayList<BasicVertex> y);
+    boolean isSubtrip(ArrayList<BasicVertex> trip, ArrayList<BasicVertex> subtrip);
+    boolean isConnectedByValue(int connectValue);
+
 }
