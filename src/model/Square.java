@@ -93,4 +93,14 @@ public class Square implements DensityChecker, Comparable<Square> {
     public boolean isConnectedByValue(int connectValue) {
         return false;
     }
+
+    @Override
+    public boolean isCrucialPath(ArrayList<BasicVertex> vertexList) {
+        return false;
+    }
+
+    @Override
+    public boolean isClosedWorld() {
+        return false;
+    }
 }

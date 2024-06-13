@@ -15,5 +15,7 @@ public interface DensityChecker {
     int countCommonVertices(ArrayList<BasicVertex> x, ArrayList<BasicVertex> y);
     boolean isSubtrip(ArrayList<BasicVertex> trip, ArrayList<BasicVertex> subtrip);
     boolean isConnectedByValue(int connectValue);
+    boolean isCrucialPath(ArrayList<BasicVertex> vertexList);
+    boolean isClosedWorld();
 
 }

@@ -6,6 +6,9 @@ import model.sites.PoliceStation;
 
 import java.util.*;
 
+//TODO: OFFENE FRAGEN: Muss bei isCrucialPath() der sparseVertexArray zurückersetzt werden?
+//TODO: Wie ist isCircle genau definiert? Kann in der VertexList auch ein Punkt 2 mal vorkommen?
+
 public class SparseMap extends BasicMap implements DensityChecker {
     private BasicVertex[][] sparseVertexArray;
 
@@ -183,4 +186,80 @@ public class SparseMap extends BasicMap implements DensityChecker {
 
         return visited.size() == vertexWithValue.size();
     }
+
+    @Override
+    public boolean isCrucialPath(ArrayList<BasicVertex> vertexList) {
+        if (vertexList.size() < 2) {
+            return false;
+        }
+
+        if (!isBasicPathOverStreets(vertexList)) {
+            return false;
+        }
+
+        BasicVertex s = vertexList.getFirst();
+        BasicVertex t = vertexList.getLast();
+
+        List<BasicVertex> streetVertices = new ArrayList<>(vertexList.subList(1, vertexList.size() - 1));
+        Map<Position2D, BasicVertex> originalMap = new HashMap<>();
+        for (BasicVertex vertex : streetVertices) {
+            originalMap.put(vertex.getPosition(), vertex);
+            replaceWithBasicGreen(vertex);
+        }
+        boolean result = !s.isBasicStreetConnectedTo(t);
+
+        for (Map.Entry<Position2D, BasicVertex> entry : originalMap.entrySet()) {
+            resetBackToBasicStreet(entry.getKey(), entry.getValue());
+        }
+
+        return result;
+    }
+
+    @Override
+    public boolean isClosedWorld() {
+        if (!isBasicStreetConnectedMap()) {
+        return false; }
+
+        for (int i = 0; i < sparseVertexArray.length; i++) {
+            if (sparseVertexArray[i][0] instanceof BasicStreet
+                    && ((BasicStreet) sparseVertexArray[i][0]).isBasicDeadEnd()) {
+                return false;
+            }
+            if (sparseVertexArray[i][sparseVertexArray[i].length - 1] instanceof BasicStreet
+                    && ((BasicStreet) sparseVertexArray[i][sparseVertexArray[i].length - 1]).isBasicDeadEnd()) {
+                return false;
+            }
+        }
+        for (int j = 0; j < sparseVertexArray[0].length - 1; j++) {
+            if (sparseVertexArray[0][j] instanceof BasicStreet
+                    && ((BasicStreet) sparseVertexArray[0][j]).isBasicDeadEnd()) {
+                return false;
+            }
+            if (sparseVertexArray[sparseVertexArray.length - 1][j] instanceof BasicStreet
+                    && ((BasicStreet) sparseVertexArray[sparseVertexArray.length - 1][j]).isBasicDeadEnd()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    private void replaceWithBasicGreen(BasicVertex vertex) {
+        int row = vertex.getPosition().getRow();
+        int column = vertex.getPosition().getColumn();
+        BasicGreen basicGreen = new BasicGreen(row, column, vertex.getValue());
+        sparseVertexArray[row][column] = basicGreen;
+    }
+
+    private void resetBackToBasicStreet(Position2D position2D, BasicVertex originalVertex) {
+        sparseVertexArray[position2D.getRow()][position2D.getColumn()] = originalVertex;
+    }
+
+
+
+
+
+
+
 }
