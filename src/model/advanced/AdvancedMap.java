@@ -46,20 +46,14 @@ public class AdvancedMap{
                     int x = code / 10;
                     int y = code % 10;
 
-                    AdvancedStreet.StreetTypes newStreetType;
-                    switch (x) {
-                        case 1: newStreetType = AdvancedStreet.StreetTypes.CROSSING;
-                        break;
-                        case 2: newStreetType = AdvancedStreet.StreetTypes.TJUNCTION;
-                        break;
-                        case 3: newStreetType = AdvancedStreet.StreetTypes.LINE;
-                        break;
-                        case 4: newStreetType = AdvancedStreet.StreetTypes.CURVE;
-                        break;
-                        case 5: newStreetType = AdvancedStreet.StreetTypes.NEEDLE;
-                        break;
-                        default: throw new IllegalArgumentException("Unknown street type: " + x);
-                    }
+                    AdvancedStreet.StreetTypes newStreetType = switch (x) {
+                        case 1 -> AdvancedStreet.StreetTypes.CROSSING;
+                        case 2 -> AdvancedStreet.StreetTypes.TJUNCTION;
+                        case 3 -> AdvancedStreet.StreetTypes.LINE;
+                        case 4 -> AdvancedStreet.StreetTypes.CURVE;
+                        case 5 -> AdvancedStreet.StreetTypes.NEEDLE;
+                        default -> throw new IllegalArgumentException("Unknown street type: " + x);
+                    };
 
                     AdvancedStreet street = (AdvancedStreet) vertex;
                     street.type = newStreetType;
@@ -97,6 +91,20 @@ public class AdvancedMap{
             visited.add(next);
         }
         return true;
+    }
+
+    void isAdvancedCircle(ArrayList<AdvancedStreet> streetList) {
+        //ist erster = letzter
+        // ist Path für alle bis auf letzten?
+        // verknüpfung zwischen vorletzten und letzten street
+    }
+
+    void hasSkeleton() {
+        //Folie 29 fragen
+        //kein Dummie
+        //erstmal typ checken
+        //Typen kompatibel zueinander für fall 3 (Hilfsmethode)
+
     }
 
 

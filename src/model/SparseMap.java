@@ -3,6 +3,7 @@ package model;
 import model.abstractClasses.DensityChecker;
 import model.sites.Hospital;
 import model.sites.PoliceStation;
+import model.sites.Site;
 
 import java.util.*;
 
@@ -257,9 +258,7 @@ public class SparseMap extends BasicMap implements DensityChecker {
     }
 
 
-
-
-
-
-
+    public void replaceVertex(Position2D position, BasicVertex newVertex) {
+        sparseVertexArray[position.getRow()][position.getColumn()] = newVertex;
+    }
 }
