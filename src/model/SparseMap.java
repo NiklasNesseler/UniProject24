@@ -245,6 +245,137 @@ public class SparseMap extends BasicMap implements DensityChecker {
         return true;
     }
 
+    @Override
+    public boolean isCircle(ArrayList<BasicVertex> vertexList) {
+        if (vertexList == null || vertexList.size() < 3) {
+            return false;
+        }
+
+        BasicVertex first = vertexList.getFirst();
+        BasicVertex last = vertexList.getLast();
+
+        if (!first.equals(last)) {
+            return false;
+        }
+
+        ArrayList<BasicVertex> path = new ArrayList<>(vertexList.subList(0, vertexList.size() - 1));
+        if (!isCrucialPath(path)) {
+            return false;
+        }
+
+        BasicVertex secondToLast = vertexList.get(vertexList.size() - 2);
+        Set<BasicVertex> visited = new HashSet<>(path);
+
+        //wahrscheinlich falsch, muss ja keine straße sein
+        return isDirectlyConnectedTo(secondToLast, last, visited);
+    }
+
+    private boolean isDirectlyConnectedTo(BasicVertex secondToLast, BasicVertex last, Set<BasicVertex> visited) {
+        if (secondToLast == null || last == null) {
+            return false;
+        }
+        for (BasicVertex neighbour : secondToLast.getNeighbours()) {
+            if (neighbour.equals(last) && !visited.contains(neighbour)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isCircle() {
+        if (!areAllStreetsConnected()) {
+            return false;
+        }
+
+        List<BasicStreet> streets = new ArrayList<>();
+
+        for (int i = 0; i < sparseVertexArray.length; i++) {
+            for (int j = 0; j < sparseVertexArray[i].length; j++) {
+                if (sparseVertexArray[i][j] instanceof BasicStreet) {
+                    streets.add((BasicStreet) sparseVertexArray[i][j]);
+                }
+            }
+        }
+        if (streets.isEmpty() || streets.size() < 4) {
+            return false;
+        }
+
+        ArrayList<BasicVertex> vertexList = new ArrayList<>(streets);
+
+        return isCircle(vertexList);
+    }
+
+
+
+    private boolean areAllStreetsConnected() {
+        for (BasicVertex[] row : getSparseVertexArray()) {
+            for (BasicVertex vertex : row) {
+                if (vertex instanceof BasicStreet) {
+                    if (!isConnectedToAnotherStreet(vertex)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean isConnectedToAnotherStreet(BasicVertex street) {
+        List<BasicVertex> neighbours = street.getNeighbours();
+
+        for (BasicVertex neighbour : neighbours) {
+            if (neighbour instanceof BasicStreet) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isTour(ArrayList<BasicVertex> vertexList, ArrayList<BasicVertex> stops) {
+        if (vertexList == null || stops == null || stops.isEmpty() || vertexList.isEmpty()) {
+            return false;
+        }
+
+        Set<BasicVertex> stopSet = new HashSet<>(stops);
+        if (stopSet.size() != stops.size()) {
+            return false;
+        }
+
+        if (!isCircle(vertexList)) {
+            return false;
+        }
+
+        for (BasicVertex vertex : vertexList) {
+            if (!stopSet.contains(vertex) && !(vertex instanceof BasicStreet)) {
+                return false;
+            }
+        }
+
+        if (!vertexList.getFirst().equals(stops.getFirst())) {
+            return false;
+        }
+
+        Set<BasicVertex> visitedStops = new HashSet<>();
+        for (int i = 1; i < stops.size(); i++) {
+            BasicVertex stop = stops.get(i);
+            if (!vertexList.contains(stop)) {
+                return false;
+            }
+
+            visitedStops.add(stop);
+        }
+
+        int stopIndex = 1;
+        for (int i = 1; i < vertexList.size() && stopIndex < stops.size(); i++) {
+            if (vertexList.get(i).equals(stops.get(stopIndex))) {
+                stopIndex++;
+            }
+        }
+        return stopIndex == stops.size();
+    }
+
 
     private void replaceWithBasicGreen(BasicVertex vertex) {
         int row = vertex.getPosition().getRow();
@@ -261,4 +392,6 @@ public class SparseMap extends BasicMap implements DensityChecker {
     public void replaceVertex(Position2D position, BasicVertex newVertex) {
         sparseVertexArray[position.getRow()][position.getColumn()] = newVertex;
     }
+
+
 }

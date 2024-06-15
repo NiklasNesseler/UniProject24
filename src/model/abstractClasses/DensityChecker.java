@@ -17,5 +17,8 @@ public interface DensityChecker {
     boolean isConnectedByValue(int connectValue);
     boolean isCrucialPath(ArrayList<BasicVertex> vertexList);
     boolean isClosedWorld();
+    boolean isCircle(ArrayList<BasicVertex> vertexList);
+    boolean isCircle();
+    boolean isTour(ArrayList<BasicVertex> vertexList, ArrayList<BasicVertex> stops);
 
 }

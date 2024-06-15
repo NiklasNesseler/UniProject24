@@ -103,4 +103,19 @@ public class Square implements DensityChecker, Comparable<Square> {
     public boolean isClosedWorld() {
         return false;
     }
+
+    @Override
+    public boolean isCircle(ArrayList<BasicVertex> vertexList) {
+        return false;
+    }
+
+    @Override
+    public boolean isCircle() {
+        return false;
+    }
+
+    @Override
+    public boolean isTour(ArrayList<BasicVertex> vertexList, ArrayList<BasicVertex> stops) {
+        return false;
+    }
 }
