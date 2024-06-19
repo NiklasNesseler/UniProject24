@@ -151,7 +151,7 @@ public class BasicMap extends BasicMapTemplate {
 
         int size = vertexList.size();
 
-        BasicVertex first = vertexList.get(0);
+        BasicVertex first = vertexList.getFirst();
         BasicVertex last = vertexList.get(size - 1);
 
 
