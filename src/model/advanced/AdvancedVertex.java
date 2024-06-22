@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-public abstract class AdvancedVertex extends BasicVertex {
+public class AdvancedVertex extends BasicVertex {
     boolean[][] parts;
     private AdvancedMap containingAdvancedMap;
     
@@ -28,7 +28,7 @@ public abstract class AdvancedVertex extends BasicVertex {
         }
     }
 
-    void rotate90() {
+    public void rotate90() {
         int n = parts.length;
         boolean[][] rotated = new boolean[n][n];
 
@@ -37,6 +37,7 @@ public abstract class AdvancedVertex extends BasicVertex {
                 rotated[j][n - 1 - i] = parts[i][j];
             }
         }
+        parts = rotated;
     }
 
     public boolean[][] getParts() {
