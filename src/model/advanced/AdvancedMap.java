@@ -31,9 +31,13 @@ public class AdvancedMap{
                     advancedVertexArray[i][j] = new AdvancedGreen(i, j, basicVertex.getValue());
                 } else if (basicVertex instanceof BasicBuilding) {
                     advancedVertexArray[i][j] = new AdvancedBuilding(i, j, basicVertex.getValue());
+                } else {
+                    advancedVertexArray[i][j] = new AdvancedVertex(i, j, basicVertex.getValue());
                 }
 
-                advancedVertexArray[i][j].setContainingAdvancedMap(this);
+                if (advancedVertexArray[i][j] != null) {
+                    advancedVertexArray[i][j].setContainingAdvancedMap(this);
+                }
             }
         }
     }

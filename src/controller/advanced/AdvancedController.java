@@ -15,4 +15,12 @@ public class AdvancedController {
         this.advancedMap = new AdvancedMap(basicController.getCompleteBasicMap());
         this.advancedMap.buildAdvancedStreets(streetCodes);
     }
+
+    public AdvancedMap getAdvancedMap() {
+        return advancedMap;
+    }
+
+    public void setAdvancedMap(AdvancedMap advancedMap) {
+        this.advancedMap = advancedMap;
+    }
 }
