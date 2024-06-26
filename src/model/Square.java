@@ -13,7 +13,7 @@ public class Square implements DensityChecker, Comparable<Square> {
         initSquareMembers(basicVertex);
     }
 
-    void initSquareMembers(BasicVertex basicVertex) {
+    public void initSquareMembers(BasicVertex basicVertex) {
         squareMembers[0] = basicVertex;
         squareMembers[1] = findRightNeighbour(basicVertex);
         squareMembers[2] = findBottomNeighbour(squareMembers[1]);

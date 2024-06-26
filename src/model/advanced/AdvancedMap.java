@@ -72,13 +72,12 @@ public class AdvancedMap{
         }
     }
 
-    boolean isAdvancedPath(ArrayList<AdvancedStreet> streetList) {
+    public boolean isAdvancedPath(ArrayList<AdvancedStreet> streetList) {
         if (streetList == null || streetList.isEmpty() || streetList.size() < 3) {
             return false;
         }
 
         AdvancedStreet first = streetList.getFirst();
-        AdvancedStreet last = streetList.getLast();
 
         Set<AdvancedStreet> visited = new HashSet<>();
         visited.add(first);
@@ -87,18 +86,42 @@ public class AdvancedMap{
             AdvancedStreet current = streetList.get(i);
             AdvancedStreet next = streetList.get(i + 1);
             if (visited.contains(next)) {
+//                System.out.println("Loop detected at: " + next.getPosition());
                 return false;
             }
 
-            if (!current.isAdvancedStreetConnectedTo(next, visited)) {
+            if (!areStreetsConnected(current, next)) {
+//                System.out.println("Disconnection detected between " + current.getPosition().getRow() + ", " + current.getPosition().getColumn() +
+//                " and " + next.getPosition().getRow() + "," + next.getPosition().getColumn());
                 return false;
             }
-            visited.add(next);
+
         }
         return true;
     }
 
-    boolean isAdvancedCircle(ArrayList<AdvancedStreet> streetList) {
+    private boolean areStreetsConnected(AdvancedStreet current, AdvancedStreet next) {
+        int r1 = current.getPosition().getRow();
+        int c1 = current.getPosition().getColumn();
+        int r2 = next.getPosition().getRow();
+        int c2 = next.getPosition().getColumn();
+
+        if (r1 == r2 && c1 == c2 + 1) {
+            return current.getParts()[1][0] && next.getParts()[1][2];
+        }
+        if (r1 == r2 && c1 == c2 - 1) {
+            return current.getParts()[1][2] && next.getParts()[1][0];
+        }
+        if (r1 == r2 + 1 && c1 == c2) {
+            return current.getParts()[0][1] && next.getParts()[2][1];
+        }
+        if (r1 == r2 - 1 && c1 == c2) {
+            return current.getParts()[2][1] && next.getParts()[0][1];
+        }
+        return false;
+    }
+
+    public boolean isAdvancedCircle(ArrayList<AdvancedStreet> streetList) {
         //ist erster = letzter
         // ist Path für alle bis auf letzten?
         // verknüpfung zwischen vorletzten und letzten street

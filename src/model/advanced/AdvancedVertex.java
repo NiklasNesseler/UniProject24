@@ -3,10 +3,7 @@ package model.advanced;
 import model.BasicStreet;
 import model.BasicVertex;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 public class AdvancedVertex extends BasicVertex {
     boolean[][] parts;
@@ -56,5 +53,27 @@ public class AdvancedVertex extends BasicVertex {
 
     public void setContainingAdvancedMap(AdvancedMap containingAdvancedMap) {
         this.containingAdvancedMap = containingAdvancedMap;
+    }
+
+    public List<AdvancedVertex> getAdvancedNeighbours() {
+        List<AdvancedVertex> neighbours = new ArrayList<>();
+        int row = getPosition().getRow();
+        int column = getPosition().getColumn();
+        AdvancedVertex[][] map = getContainingAdvancedMap().getAdvancedVertexArray();
+
+        if (row > 0) {
+            neighbours.add(map[row - 1][column]);
+        }
+        if (row < map.length - 1) {
+            neighbours.add(map[row + 1][column]);
+        }
+        if (column > 0) {
+            neighbours.add(map[row][column - 1]);
+        }
+        if (column < map[0].length - 1) {
+            neighbours.add(map[row][column + 1]);
+        }
+
+        return neighbours;
     }
 }

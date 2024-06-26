@@ -76,21 +76,21 @@ public class AdvancedStreet extends AdvancedVertex {
         if (v == null) {
             return false;
         }
-        Queue<BasicVertex> q = new LinkedList<>();
-        Set<BasicVertex> visited = new HashSet<>();
+        Queue<AdvancedVertex> q = new LinkedList<>();
+        Set<AdvancedVertex> visited = new HashSet<>();
 
         q.add(this);
         visited.add(this);
 
         while (!q.isEmpty()) {
-            BasicVertex current = q.poll();
+            AdvancedVertex current = q.poll();
             visited.add(current);
             if (current.equals(v)) {
                 return true;
             }
 
-            for (BasicVertex neighbour : current.getNeighbours()) {
-                if (!visited.contains(neighbour) && (neighbour instanceof BasicStreet || neighbour.equals(v)) && !blackList.contains(neighbour)) {
+            for (AdvancedVertex neighbour : current.getAdvancedNeighbours()) {
+                if (!visited.contains(neighbour) && (neighbour instanceof AdvancedStreet || neighbour.equals(v)) && !blackList.contains(neighbour)) {
                     q.add(neighbour);
 
                 }

@@ -16,5 +16,8 @@ import java.util.Map;
 public class PP24_main {
 
 	public static void main(String[] args) {
+
+//
+
 	}
 }
