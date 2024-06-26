@@ -172,13 +172,21 @@ public class SiteManager {
         }
     }
 
+    public SparseMap getSitemap() {
+        return sitemap;
+    }
+
+    public void setSitemap(SparseMap sitemap) {
+        this.sitemap = sitemap;
+    }
+
     /*
-    Sortiert man aufsteigend einmal die value-Werte der Knoten aus a und einmal die
-    value-Werte der Knoten aus b, so seien V (a) und V (b) die daraus resultierenden
-    Zahlenfolgen. Ist V (a) lexikographisch kleiner als V (b), dann gibt die Methode a
-    zurück, im umgekehrten Fall gibt die Methode b zurück. Sind beide lexikographisch
-    gleich, so wird a zurück gegeben.
-     */
+        Sortiert man aufsteigend einmal die value-Werte der Knoten aus a und einmal die
+        value-Werte der Knoten aus b, so seien V (a) und V (b) die daraus resultierenden
+        Zahlenfolgen. Ist V (a) lexikographisch kleiner als V (b), dann gibt die Methode a
+        zurück, im umgekehrten Fall gibt die Methode b zurück. Sind beide lexikographisch
+        gleich, so wird a zurück gegeben.
+         */
     ArrayList<BasicVertex> getMinLexi(ArrayList<BasicVertex> a, ArrayList<BasicVertex> b) {
         List<Integer> valuesA = new ArrayList<>();
         for (BasicVertex v : a) {

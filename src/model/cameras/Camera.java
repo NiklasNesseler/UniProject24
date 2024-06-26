@@ -34,7 +34,7 @@ public class Camera {
 
                 if (isInBound(currentRow, currentColumn, vertexArray)) {
                     BasicVertex current = vertexArray[currentRow][currentColumn];
-                    if (cameraVertex.getBasicManhattanDistance(current) <= range && isVisible(current)) {
+                    if (cameraVertex.getBasicManhattanDistance(current) <= range && isVisible(current, vertexArray)) {
                         observedVertices.add(current);
                     }
                 }
@@ -43,8 +43,36 @@ public class Camera {
         observedVertices.sort(Comparator.comparingInt(BasicVertex::getValue));
     }
 
-    private boolean isVisible(BasicVertex current) {
-        return !(current instanceof BasicBuilding);
+    private boolean isVisible(BasicVertex current, BasicVertex[][] basicVertexArray) {
+        if (current instanceof BasicBuilding) {
+            return false;
+        }
+        int cameraRow = position.getRow();
+        int cameraColumn = position.getColumn();
+        int endRow = current.getPosition().getRow();
+        int endColumn = current.getPosition().getColumn();
+
+        if (cameraRow == endRow) {
+            int minCol = Math.min(cameraColumn, endColumn);
+            int maxCol = Math.max(cameraColumn, endColumn);
+            for (int col = minCol + 1; col < maxCol; col++) {
+                if (basicVertexArray[cameraRow][col] instanceof BasicBuilding) {
+                    return false;
+                }
+            }
+        }
+        else if (cameraColumn == endColumn) {
+            int minRow = Math.min(cameraRow, endRow);
+            int maxRow = Math.max(cameraRow, endRow);
+            for (int row = minRow + 1; row < maxRow; row++) {
+                if (basicVertexArray[row][cameraColumn] instanceof BasicBuilding) {
+                    return false;
+                }
+            }
+        } else {
+            return false;
+        }
+        return true;
     }
 
     private boolean isInBound(int currentRow, int currentColumn, BasicVertex[][] vertexArray) {

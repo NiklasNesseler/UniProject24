@@ -116,7 +116,7 @@ public class DistanceDurationGrid {
         if (a.equals(b)) {
             return 0;
         } else if (a instanceof BasicStreet streetA && b instanceof BasicStreet streetB && a.getNeighbours().contains(b)) {
-            if (streetA.getSpeedLimit() == 0 && streetB.getSpeedLimit() == 0) {
+            if (streetA.getSpeedLimit() == 0 || streetB.getSpeedLimit() == 0) {
                 return Integer.MAX_VALUE;
             }
             else {

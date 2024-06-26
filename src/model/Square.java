@@ -21,23 +21,17 @@ public class Square implements DensityChecker, Comparable<Square> {
     }
 
     private BasicVertex findBottomNeighbour(BasicVertex vertex) {
-        List<BasicVertex> neighbours = vertex.getNeighbours();
-        for (BasicVertex neighbour : neighbours) {
-            if (neighbour.getPosition().getColumn() == vertex.getPosition().getColumn() + 1) {
-                return neighbour;
-            }
-        }
-        return null;
+        int row = vertex.getPosition().getRow() + 1;
+        int column = vertex.getPosition().getColumn();
+
+        return vertex.getContainingMap().getVertexArray()[row][column];
+
     }
 
     private BasicVertex findRightNeighbour(BasicVertex vertex) {
-        List<BasicVertex> neighbours = vertex.getNeighbours();
-        for (BasicVertex neighbour : neighbours) {
-            if (neighbour.getPosition().getRow() == vertex.getPosition().getRow() + 1) {
-                return neighbour;
-            }
-        }
-        return null;
+        int row = vertex.getPosition().getRow();
+        int column = vertex.getPosition().getColumn() + 1;
+        return vertex.getContainingMap().getVertexArray()[row][column];
     }
 
     @Override
@@ -112,6 +106,14 @@ public class Square implements DensityChecker, Comparable<Square> {
     @Override
     public boolean isCircle() {
         return false;
+    }
+
+    public BasicVertex[] getSquareMembers() {
+        return squareMembers;
+    }
+
+    public void setSquareMembers(BasicVertex[] squareMembers) {
+        this.squareMembers = squareMembers;
     }
 
     @Override

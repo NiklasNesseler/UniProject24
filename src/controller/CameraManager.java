@@ -23,6 +23,22 @@ public class CameraManager {
         this.cameraCosts = cameraCosts;
     }
 
+    public SparseMap getObservedMap() {
+        return observedMap;
+    }
+
+    public void setObservedMap(SparseMap observedMap) {
+        this.observedMap = observedMap;
+    }
+
+    public int[][] getCameraCosts() {
+        return cameraCosts;
+    }
+
+    public void setCameraCosts(int[][] cameraCosts) {
+        this.cameraCosts = cameraCosts;
+    }
+
     boolean isCameraCover(ArrayList<Camera> cameras) {
         ArrayList<BasicVertex> observedStreets = new ArrayList<>();
         for (BasicVertex[] row : observedMap.getSparseVertexArray()) {

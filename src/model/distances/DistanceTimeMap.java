@@ -15,6 +15,8 @@ public class DistanceTimeMap {
         initGrid();
     }
 
+
+
     private void initGrid() {
         this.grid = new DistanceDurationGrid(sparseMap);
     }
