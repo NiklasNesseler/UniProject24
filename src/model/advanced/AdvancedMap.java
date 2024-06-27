@@ -146,9 +146,10 @@ public class AdvancedMap{
         return secondToLast.isAdvancedStreetConnectedTo(last, visited);
     }
 
-    boolean hasSkeleton() {
+    public boolean hasSkeleton() {
         Set<AdvancedStreet> streets = new HashSet<>();
 
+        // Collect all AdvancedStreet objects in advancedVertexArray
         for (int i = 0; i < advancedVertexArray.length; i++) {
             for (int j = 0; j < advancedVertexArray[i].length; j++) {
                 if (advancedVertexArray[i][j] instanceof AdvancedStreet) {
@@ -157,31 +158,46 @@ public class AdvancedMap{
             }
         }
 
+        //1
         if (streets.size() < 2) {
             return false;
         }
+        //2
+        for (AdvancedStreet street : streets) {
+            int count = 0;
+            boolean[][] parts = street.getParts();
+            for (int x = 0; x < parts.length; x++) {
+                for (int y = 0; y < parts[x].length; y++) {
+                    if (parts[x][y]) {
+                        count++;
+                    }
+                }
+            }
+            if (count < 2) {
+                return false;
+            }
+        }
 
+        //3 und 4
         for (AdvancedStreet street : streets) {
             boolean neighbourFound = false;
             for (AdvancedStreet neighbour : getAdvancedStreetNeighbours(street)) {
-                if (street.isAdvancedStreetConnectedTo(neighbour, new HashSet<>())) {
+                if (areStreetsConnected(street, neighbour)) {
                     neighbourFound = true;
-                    break;
+                } else {
+                    return false;
                 }
             }
             if (!neighbourFound) {
                 return false;
             }
-        }
 
-        for (AdvancedStreet street : streets) {
             if (!skeletonReq4(street)) {
                 return false;
             }
         }
 
         return true;
-
     }
 
 
@@ -206,6 +222,7 @@ public class AdvancedMap{
         return neighbours;
     }
 
+
     private boolean skeletonReq4(AdvancedStreet street) {
         boolean[][] parts = street.getParts();
         int row = street.getPosition().getRow();
@@ -218,78 +235,85 @@ public class AdvancedMap{
                     return false;
                 }
             }
+        } else if (row > 0 && parts[0][0] || parts[0][1] || parts[0][2]) {
+            return false;
         }
-        if (row > 0 && advancedVertexArray[row][column - 1] instanceof AdvancedStreet) {
-            boolean[][] neighbourParts = ((AdvancedStreet) advancedVertexArray[row][column - 1]).getParts();
-            for (int i = 0; i < 3; i++) {
-                if (parts[i][2] && !neighbourParts[i][0]) {
-                    return false;
-                }
-            }
-        }
-
-        if (row < advancedVertexArray.length && advancedVertexArray[row + 1][column] instanceof AdvancedStreet) {
+        if (row < advancedVertexArray.length - 1 && advancedVertexArray[row + 1][column] instanceof AdvancedStreet) {
             boolean[][] neighbourParts = ((AdvancedStreet) advancedVertexArray[row + 1][column]).getParts();
             for (int i = 0; i < 3; i++) {
                 if (parts[2][i] && !neighbourParts[0][i]) {
                     return false;
                 }
             }
+        } else if (row < advancedVertexArray.length - 1 && parts[2][0] || parts[2][1] || parts[2][2]) {
+            return false;
         }
 
-        if (row < advancedVertexArray[0].length && advancedVertexArray[row][column + 1] instanceof AdvancedStreet) {
-            boolean[][] neighbourParts = ((AdvancedStreet) advancedVertexArray[row + 1][column]).getParts();
+        if (column > 0 && advancedVertexArray[row][column - 1] instanceof AdvancedStreet) {
+            boolean[][] neighbourParts = ((AdvancedStreet) advancedVertexArray[row][column - 1]).getParts();
+            for (int i = 0; i < 3; i++) {
+                if (parts[i][0] && !neighbourParts[i][2]) {
+                    return false;
+                }
+            }
+        } else if (column > 0 && parts[0][0] || parts[1][0] || parts[2][0]) {
+            return false;
+        }
+
+        if (column < advancedVertexArray[0].length - 1 && advancedVertexArray[row][column + 1] instanceof AdvancedStreet) {
+            boolean[][] neighbourParts = ((AdvancedStreet) advancedVertexArray[row][column + 1]).getParts();
             for (int i = 0; i < 3; i++) {
                 if (parts[i][2] && !neighbourParts[i][0]) {
                     return false;
                 }
             }
+        } else if (column < advancedVertexArray[0].length - 1 && parts[0][2] || parts[1][2] || parts[2][2]) {
+            return false;
         }
+
         return true;
     }
 
 
-    ArrayList<? extends AdvancedVertex> listMostFrequentType() {
+    public ArrayList<? extends AdvancedVertex> listMostFrequentType() {
         int streetCount = 0;
         int buildingCount = 0;
         int greenCount = 0;
 
-        for (int i = 0; i < advancedVertexArray.length; i++) {
-            for (int j = 0; j < advancedVertexArray[i].length; j++) {
-                AdvancedVertex vertex = advancedVertexArray[i][j];
+        for (AdvancedVertex[] advancedVertices : advancedVertexArray) {
+            for (AdvancedVertex vertex : advancedVertices) {
                 if (vertex instanceof AdvancedStreet) {
                     streetCount++;
                 } else if (vertex instanceof AdvancedBuilding) {
                     buildingCount++;
                 } else if (vertex instanceof AdvancedGreen) {
                     greenCount++;
-                } }}
+                }
+            }
+        }
 
         ArrayList<AdvancedVertex> mostFrequentType = new ArrayList<>();
         if (streetCount > buildingCount && streetCount > greenCount) {
-            for (int i = 0; i < advancedVertexArray.length; i++) {
-                for (int j = 0; j < advancedVertexArray[i].length; j++) {
-                    if (advancedVertexArray[i][i] instanceof AdvancedStreet) {
-                        mostFrequentType.add(advancedVertexArray[i][i]);
+            for (AdvancedVertex[] advancedVertices : advancedVertexArray) {
+                for (AdvancedVertex advancedVertex : advancedVertices) {
+                    if (advancedVertex instanceof AdvancedStreet) {
+                        mostFrequentType.add(advancedVertex);
                     }
                 }
             }
-        }
-        if (buildingCount > streetCount && buildingCount > greenCount) {
-            for (int i = 0; i < advancedVertexArray.length; i++) {
-                for (int j = 0; j < advancedVertexArray[i].length; j++) {
-                    if (advancedVertexArray[i][i] instanceof AdvancedBuilding) {
-                        mostFrequentType.add(advancedVertexArray[i][i]);
+        } else if (buildingCount > streetCount && buildingCount > greenCount) {
+            for (AdvancedVertex[] advancedVertices : advancedVertexArray) {
+                for (AdvancedVertex advancedVertex : advancedVertices) {
+                    if (advancedVertex instanceof AdvancedBuilding) {
+                        mostFrequentType.add(advancedVertex);
                     }
                 }
             }
-        }
-
-        if (greenCount > streetCount && greenCount > buildingCount) {
-            for (int i = 0; i < advancedVertexArray.length; i++) {
-                for (int j = 0; j < advancedVertexArray[i].length; j++) {
-                    if (advancedVertexArray[i][i] instanceof AdvancedGreen) {
-                        mostFrequentType.add(advancedVertexArray[i][i]);
+        } else if (greenCount > streetCount && greenCount > buildingCount) {
+            for (AdvancedVertex[] advancedVertices : advancedVertexArray) {
+                for (AdvancedVertex advancedVertex : advancedVertices) {
+                    if (advancedVertex instanceof AdvancedGreen) {
+                        mostFrequentType.add(advancedVertex);
                     }
                 }
             }
@@ -298,8 +322,6 @@ public class AdvancedMap{
         mostFrequentType.sort(Comparator.comparingInt(AdvancedVertex::getValue));
 
         return mostFrequentType;
-
-
     }
 
 
