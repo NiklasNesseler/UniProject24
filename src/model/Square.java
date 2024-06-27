@@ -9,8 +9,21 @@ public class Square implements DensityChecker, Comparable<Square> {
     private BasicVertex[] squareMembers;
 
     public Square(BasicVertex basicVertex) {
+        if (basicVertex == null) {
+            throw new IllegalArgumentException("basicVertex cannot be null");
+        }
+        if (isOnRightOrBottomEdge(basicVertex)) {
+            throw new IllegalArgumentException("BasicVertex cannot be on the right or bottom edge");
+        }
         squareMembers = new BasicVertex[4];
         initSquareMembers(basicVertex);
+    }
+
+    private boolean isOnRightOrBottomEdge(BasicVertex basicVertex) {
+        int row = basicVertex.getPosition().getRow();
+        int column = basicVertex.getPosition().getColumn();
+        SparseMap map = (SparseMap) basicVertex.getContainingMap();
+        return (row >= map.getVertexArray().length - 1 || column >= map.getVertexArray()[0].length - 1);
     }
 
     public void initSquareMembers(BasicVertex basicVertex) {
@@ -21,16 +34,28 @@ public class Square implements DensityChecker, Comparable<Square> {
     }
 
     private BasicVertex findBottomNeighbour(BasicVertex vertex) {
+        if (vertex==null) {
+            return null;
+        }
         int row = vertex.getPosition().getRow() + 1;
         int column = vertex.getPosition().getColumn();
 
+        if (row >= vertex.getContainingMap().getVertexArray().length) {
+            return null;
+        }
         return vertex.getContainingMap().getVertexArray()[row][column];
 
     }
 
     private BasicVertex findRightNeighbour(BasicVertex vertex) {
+        if (vertex == null) {
+            return null;
+        }
         int row = vertex.getPosition().getRow();
         int column = vertex.getPosition().getColumn() + 1;
+        if (column >= vertex.getContainingMap().getVertexArray()[0].length) {
+            return null;
+        }
         return vertex.getContainingMap().getVertexArray()[row][column];
     }
 
@@ -63,51 +88,6 @@ public class Square implements DensityChecker, Comparable<Square> {
 
     }
 
-    @Override
-    public boolean isSparse() {
-        return countStreetVertices() <= 3;
-    }
-
-    @Override
-    public boolean isBasicStreetConnectedMap() {
-        return false;
-    }
-
-    @Override
-    public int countCommonVertices(ArrayList<BasicVertex> x, ArrayList<BasicVertex> y) {
-        return 0;
-    }
-
-    @Override
-    public boolean isSubtrip(ArrayList<BasicVertex> trip, ArrayList<BasicVertex> subtrip) {
-        return false;
-    }
-
-    @Override
-    public boolean isConnectedByValue(int connectValue) {
-        return false;
-    }
-
-    @Override
-    public boolean isCrucialPath(ArrayList<BasicVertex> vertexList) {
-        return false;
-    }
-
-    @Override
-    public boolean isClosedWorld() {
-        return false;
-    }
-
-    @Override
-    public boolean isCircle(ArrayList<BasicVertex> vertexList) {
-        return false;
-    }
-
-    @Override
-    public boolean isCircle() {
-        return false;
-    }
-
     public BasicVertex[] getSquareMembers() {
         return squareMembers;
     }
@@ -117,7 +97,7 @@ public class Square implements DensityChecker, Comparable<Square> {
     }
 
     @Override
-    public boolean isTour(ArrayList<BasicVertex> vertexList, ArrayList<BasicVertex> stops) {
-        return false;
+    public boolean isSparse() {
+        return countStreetVertices() <= 3;
     }
 }
