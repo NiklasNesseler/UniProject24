@@ -17,7 +17,7 @@ public class DistanceTimeMap {
 
 
 
-    private void initGrid() {
+    public void initGrid() {
         this.grid = new DistanceDurationGrid(sparseMap);
     }
     int computeDistance(BasicVertex start, BasicVertex end) {

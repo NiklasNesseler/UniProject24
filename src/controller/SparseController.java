@@ -3,7 +3,9 @@ package controller;
 import model.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 public class SparseController {
     private SparseMap completeSparseMap;
@@ -35,15 +37,41 @@ public class SparseController {
         Random random = new Random();
 
         ArrayList<Position2D> streetPositions = new ArrayList<>();
+        Set<Position2D> used = new HashSet<>();
+
         while (streetPositions.size() < streets) {
             int row = random.nextInt(10);
             int col = random.nextInt(15);
             Position2D position2D = new Position2D(row, col);
 
-            if (!streetPositions.contains(position2D)) {
+            if (!used.contains(position2D)) {
+                used.add(position2D);
                 streetPositions.add(position2D);
-                sparseMap.getSparseVertexArray()[row][col] = new BasicStreet(row, col, random.nextInt(100), random.nextInt(30) + 1);
+                BasicStreet street = new BasicStreet(row, col, random.nextInt(100), random.nextInt(30) + 1);
+                street.setContainingMap(sparseMap);
+                sparseMap.getSparseVertexArray()[row][col] = street;
             }
+        }
+
+
+        int streetCount = 0;
+        for (BasicVertex[] row : sparseMap.getSparseVertexArray()) {
+            for (BasicVertex vertex : row) {
+                if (vertex instanceof BasicStreet) {
+                    streetCount++;
+                    int neighbourCount = 0;
+                    for (BasicVertex neighbour : vertex.getNeighbours()) {
+                        if (neighbour instanceof BasicStreet) {
+                            neighbourCount++;
+                        }
+                    }
+
+                }
+            }
+        }
+
+        if (streetCount != streets) {
+            return generateMapOfBuildings();
         }
 
         if (connected && !sparseMap.isBasicStreetConnectedMap()) {
@@ -65,7 +93,9 @@ public class SparseController {
         SparseMap sparseMap = new SparseMap(new int[10][15]);
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 15; j++) {
-                sparseMap.getSparseVertexArray()[i][j] = new BasicBuilding(i, j,1, 1);
+                BasicBuilding building = new BasicBuilding(i, j, 1, 1);
+                building.setContainingMap(sparseMap);
+                sparseMap.getSparseVertexArray()[i][j] = building;
 
             }
         }
