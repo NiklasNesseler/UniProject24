@@ -222,13 +222,13 @@ public class SparseMap extends BasicMap implements DensityChecker {
         if (!isBasicStreetConnectedMap()) {
         return false; }
 
-        for (int i = 0; i < sparseVertexArray.length; i++) {
-            if (sparseVertexArray[i][0] instanceof BasicStreet
-                    && ((BasicStreet) sparseVertexArray[i][0]).isBasicDeadEnd()) {
+        for (BasicVertex[] basicVertices : sparseVertexArray) {
+            if (basicVertices[0] instanceof BasicStreet
+                    && ((BasicStreet) basicVertices[0]).isBasicDeadEnd()) {
                 return false;
             }
-            if (sparseVertexArray[i][sparseVertexArray[i].length - 1] instanceof BasicStreet
-                    && ((BasicStreet) sparseVertexArray[i][sparseVertexArray[i].length - 1]).isBasicDeadEnd()) {
+            if (basicVertices[basicVertices.length - 1] instanceof BasicStreet
+                    && ((BasicStreet) basicVertices[basicVertices.length - 1]).isBasicDeadEnd()) {
                 return false;
             }
         }
@@ -385,41 +385,53 @@ public class SparseMap extends BasicMap implements DensityChecker {
             return false;
         }
 
+        //1
         Set<BasicVertex> stopSet = new HashSet<>(stops);
         if (stopSet.size() != stops.size()) {
+
             return false;
         }
 
+        //2
         if (!isCircle(vertexList)) {
+
             return false;
         }
 
+        //3
         for (BasicVertex vertex : vertexList) {
             if (!stopSet.contains(vertex) && !(vertex instanceof BasicStreet)) {
+
                 return false;
             }
         }
 
+        //4
         if (!vertexList.getFirst().equals(stops.getFirst())) {
             return false;
         }
 
+        //5
         Set<BasicVertex> visitedStops = new HashSet<>();
-        for (int i = 1; i < stops.size(); i++) {
-            BasicVertex stop = stops.get(i);
-            if (!vertexList.contains(stop)) {
-                return false;
-            }
-
-            visitedStops.add(stop);
-        }
-
-        int stopIndex = 1;
-        for (int i = 1; i < vertexList.size() && stopIndex < stops.size(); i++) {
-            if (vertexList.get(i).equals(stops.get(stopIndex))) {
+        int stopIndex = 0;
+        for (int i = 0; i < vertexList.size() - 1; i++) {
+            BasicVertex vertex = vertexList.get(i);
+            if (stopSet.contains(vertex)) {
+                if (visitedStops.contains(vertex)) {
+                    return false;
+                }
+                visitedStops.add(vertex);
+                if (stopIndex < stops.size() && !vertex.equals(stops.get(stopIndex))) {
+                    return false;
+                }
                 stopIndex++;
+                if (stopIndex > stops.size()) {
+
+                    return false;
+                }
             }
         }
+
         return stopIndex == stops.size();
     }
 
