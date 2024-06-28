@@ -1,11 +1,9 @@
-package controller.advanced;
+package controller;
 
 import model.*;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
 public class SparseController {
     private SparseMap completeSparseMap;

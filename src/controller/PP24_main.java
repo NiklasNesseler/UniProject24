@@ -1,7 +1,7 @@
 package controller;
 
 import controller.advanced.AdvancedController;
-import controller.advanced.SparseController;
+import controller.SparseController;
 import model.*;
 import model.advanced.*;
 import model.cameras.Camera;
@@ -14,11 +14,13 @@ public class PP24_main {
 
 	public static void main(String[] args) {
 
+	}
+
 
 
 
 	}
-	}
+
 
 
 
