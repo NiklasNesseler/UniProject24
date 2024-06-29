@@ -2,10 +2,7 @@ package controller;
 
 import model.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 public class SparseController {
     private SparseMap completeSparseMap;
@@ -33,52 +30,59 @@ public class SparseController {
         if (streets < 1 || streets > 50 || maxDeg < 0 || maxDeg > 4) {
             return generateMapOfBuildings();
         }
+
         SparseMap sparseMap = new SparseMap(new int[10][15]);
         Random random = new Random();
+        List<Position2D> positions = new ArrayList<>();
 
-        ArrayList<Position2D> streetPositions = new ArrayList<>();
-        Set<Position2D> used = new HashSet<>();
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 15; j++) {
 
-        while (streetPositions.size() < streets) {
-            int row = random.nextInt(10);
-            int col = random.nextInt(15);
-            Position2D position2D = new Position2D(row, col);
+                positions.add(new Position2D(i, j));
 
-            if (!used.contains(position2D)) {
-                used.add(position2D);
-                streetPositions.add(position2D);
-                BasicStreet street = new BasicStreet(row, col, random.nextInt(100), random.nextInt(30) + 1);
-                street.setContainingMap(sparseMap);
-                sparseMap.getSparseVertexArray()[row][col] = street;
             }
         }
 
-
-        int streetCount = 0;
-        for (BasicVertex[] row : sparseMap.getSparseVertexArray()) {
-            for (BasicVertex vertex : row) {
-                if (vertex instanceof BasicStreet) {
-                    streetCount++;
-                    int neighbourCount = 0;
-                    for (BasicVertex neighbour : vertex.getNeighbours()) {
-                        if (neighbour instanceof BasicStreet) {
-                            neighbourCount++;
-                        }
-                    }
-
-                }
-            }
+        Collections.shuffle(positions, random);
+        List<BasicStreet> streetsList = new ArrayList<>();
+        for (int i = 0; i < streets; i++) {
+            Position2D position = positions.get(i);
+            BasicStreet street = new BasicStreet(position.getRow(), position.getColumn(), random.nextInt(100), random.nextInt(30) + 1);
+            street.setContainingMap(sparseMap);
+            sparseMap.getSparseVertexArray()[position.getRow()][position.getColumn()] = street;
+            streetsList.add(street);
         }
 
-        if (streetCount != streets) {
+        for (int i = streets; i < positions.size(); i++) {
+            Position2D position = positions.get(i);
+            BasicGreen green = new BasicGreen(position.getRow(), position.getColumn(), random.nextInt(100));
+            green.setContainingMap(sparseMap);
+            sparseMap.getSparseVertexArray()[position.getRow()][position.getColumn()] = green;
+        }
+
+
+
+        if (!meetsCase1Reqs(streetsList, maxDeg, connected, sparseMap)) {
             return generateMapOfBuildings();
         }
 
-        if (connected && !sparseMap.isBasicStreetConnectedMap()) {
-            return generateMapOfBuildings();
-        }
         return sparseMap;
     }
+
+    private boolean meetsCase1Reqs(List<BasicStreet> streetsList, int maxDeg, boolean connected, SparseMap map) {
+        if (connected && !map.isBasicStreetConnectedMap()) {
+            return false;
+        }
+
+        for (BasicStreet street : streetsList) {
+            if (street.getNeighbours().size() > maxDeg) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 
 
     public SparseMap getCompleteSparseMap() {
@@ -99,6 +103,8 @@ public class SparseController {
 
             }
         }
+
         return sparseMap;
+
     }
 }

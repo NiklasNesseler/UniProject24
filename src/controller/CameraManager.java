@@ -3,9 +3,7 @@ package controller;
 import model.*;
 import model.cameras.Camera;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 
 public class CameraManager {
@@ -40,7 +38,10 @@ public class CameraManager {
     }
 
     boolean isCameraCover(ArrayList<Camera> cameras) {
-        ArrayList<BasicVertex> observedStreets = new ArrayList<>();
+        if (observedMap == null || cameras == null) {
+            throw new IllegalArgumentException("observedMap and cameras cannot be null");
+        }
+        Set<BasicVertex> observedStreets = new HashSet<>();
         for (BasicVertex[] row : observedMap.getSparseVertexArray()) {
             for (BasicVertex vertex : row) {
                 if (vertex instanceof BasicStreet){

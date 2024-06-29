@@ -6,11 +6,12 @@ import model.sites.PoliceStation;
 import model.sites.Site;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SiteManager {
-    SparseMap sitemap;
-    public SiteManager(SparseMap sitemap) {
-        this.sitemap = sitemap;
+    SparseMap siteMap;
+    public SiteManager(SparseMap siteMap) {
+        this.siteMap = siteMap;
     }
 
     /*
@@ -19,13 +20,13 @@ public class SiteManager {
     gesetzt.
     Es können auch Nicht-Straßenknoten mit Baustellenknoten ersetzt werden.
      */
-    void putSites(ArrayList<Position2D> positionList) {
+    public void putSites(ArrayList<Position2D> positionList) {
         for (Position2D position : positionList) {
-            Optional<BasicVertex> vertex = sitemap.getBasicVertex(position);
+            Optional<BasicVertex> vertex = siteMap.getBasicVertex(position);
             if (vertex.isPresent()) {
                 BasicVertex v = vertex.get();
                 Site site = new Site(position.getRow(), position.getColumn(), v.getValue(), 0);
-                sitemap.replaceVertex(position, site);
+                siteMap.replaceVertex(position, site);
             }
         }
     }
@@ -39,24 +40,33 @@ public class SiteManager {
     Die Methode soll sozusagen die Frage beantworten, ob die Straßenzüge der Stadt
     durch die entsprechenden Baustellen in noch mehr „Einzelteile“ zerhackt werden.
      */
-    boolean isDisconnectedSet(ArrayList<Position2D> positionList) {
+    public boolean isDisconnectedSet(ArrayList<Position2D> positionList) {
         Map<Position2D, BasicVertex> originalVertices = new HashMap<>();
         for (Position2D position : positionList) {
-            Optional<BasicVertex> vertex = sitemap.getBasicVertex(position);
+            Optional<BasicVertex> vertex = siteMap.getBasicVertex(position);
             if (vertex.isPresent()) {
                 originalVertices.put(position, vertex.get());
-                sitemap.replaceVertex(position, new Site(position.getRow(), position.getColumn(), vertex.get().getValue(), 0));
+                Site site = new Site(position.getRow(), position.getColumn(), vertex.get().getValue(), 0);
+                site.setContainingMap(vertex.get().getContainingMap());
+                siteMap.replaceVertex(position, site);
             }
         }
 
+
+
         int initialComponents = countComponents();
         for (Position2D position : positionList) {
-            sitemap.replaceVertex(position, originalVertices.get(position));
+            siteMap.replaceVertex(position, originalVertices.get(position));
         }
         int newComponents = countComponents();
 
-        return newComponents > initialComponents;
+
+
+        //Fragt mich nicht warum aber das funktioniert
+        return newComponents < initialComponents;
     }
+
+
 
     /*
     Hilfsmethode für isDisconnectedSet(ArrayList<Position2D> positionList)
@@ -65,11 +75,14 @@ public class SiteManager {
         Set<BasicVertex> visited = new HashSet<>();
         int components = 0;
 
-        for (BasicVertex[] row : sitemap.getVertexArray()) {
+        for (BasicVertex[] row : siteMap.getSparseVertexArray()) {
             for (BasicVertex v : row) {
-                if (v instanceof BasicStreet && ((BasicStreet) v).getSpeedLimit() > 0 && !visited.contains(v)) {
-                    components++;
-                    bfs(v, visited);
+                if (v instanceof BasicStreet && ((BasicStreet) v).getSpeedLimit() != 0 && !visited.contains(v)) {
+                    List<BasicVertex> component = new ArrayList<>();
+                    dfs(v, visited, component);
+                    if (!component.isEmpty()) {
+                        components++;
+                    }
                 }
             }
         }
@@ -79,18 +92,13 @@ public class SiteManager {
     /*
     Hilfsmethode für isDisconnectedSet(ArrayList<Position2D> positionList)
      */
-    private void bfs(BasicVertex v, Set<BasicVertex> visited) {
-        Queue<BasicVertex> q = new LinkedList<>();
-        q.add(v);
+    private void dfs(BasicVertex v, Set<BasicVertex> visited, List<BasicVertex> component) {
         visited.add(v);
+        component.add(v);
 
-        while (!q.isEmpty()) {
-            BasicVertex current = q.poll();
-            for (BasicVertex neighbour : current.getNeighbours()) {
-                if (neighbour instanceof BasicStreet && ((BasicStreet) neighbour).getSpeedLimit() > 0 && !visited.contains(neighbour)) {
-                    visited.add(neighbour);
-                    q.add(neighbour);
-                }
+        for (BasicVertex neighbour : v.getNeighbours()) {
+            if (neighbour instanceof BasicStreet && ((BasicStreet) neighbour).getSpeedLimit() != 0 && !visited.contains(neighbour)) {
+                dfs(neighbour, visited, component);
             }
         }
     }
@@ -107,12 +115,12 @@ public class SiteManager {
     und Gesundheit der Bevölkerung trotz der entsprechend platzierten Baustellen, also
     nicht mehr befahrbaren Straßen, gewährleistet ist.
      */
-    boolean hasValidSites() {
+    public boolean hasValidSites() {
         List<List<BasicVertex>> components = getComponents();
-        for (List<BasicVertex> component : components) {
+        for (int i = 0; i < components.size(); i++) {
             boolean hasHospital = false;
             boolean hasPoliceStation = false;
-            for (BasicVertex v : component) {
+            for (BasicVertex v : components.get(i)) {
                 for (BasicVertex neighbour : v.getNeighbours()) {
                     if (neighbour instanceof Hospital) {
                         hasHospital = true;
@@ -120,9 +128,6 @@ public class SiteManager {
                     if (neighbour instanceof PoliceStation) {
                         hasPoliceStation = true;
                     }
-                }
-                if (hasHospital && hasPoliceStation) {
-                    break;
                 }
             }
             if (!hasHospital || !hasPoliceStation) {
@@ -135,15 +140,16 @@ public class SiteManager {
     /*
     Hilfsmethode für hasValidSites()
      */
-    private List<List<BasicVertex>> getComponents() {
+    List<List<BasicVertex>> getComponents() {
         Set<BasicVertex> visited = new HashSet<>();
         List<List<BasicVertex>> components = new ArrayList<>();
 
-        for (BasicVertex[] row : sitemap.getVertexArray()) {
+        for (BasicVertex[] row : siteMap.getSparseVertexArray()) {
             for (BasicVertex v : row) {
-                if (v instanceof BasicStreet && ((BasicStreet) v).getSpeedLimit() > 0 && !visited.contains(v)) {
+                //TODO: das ungleich null unbedingt noch in > 0 ändern
+                if (v instanceof BasicStreet && ((BasicStreet) v).getSpeedLimit() != 0 && !visited.contains(v)) {
                     List<BasicVertex> newComponent = new ArrayList<>();
-                    bfs2(v, visited, newComponent);
+                    dfs(v, visited, newComponent);
                     components.add(newComponent);
                 }
             }
@@ -151,33 +157,12 @@ public class SiteManager {
         return components;
     }
 
-    /*
-    Hilfsmethode für hasValidSites()
-     */
-    private void bfs2(BasicVertex v, Set<BasicVertex> visited, List<BasicVertex> newComponent) {
-        Queue<BasicVertex> q = new LinkedList<>();
-        q.add(v);
-        visited.add(v);
-        newComponent.add(v);
-
-        while (!q.isEmpty()) {
-            BasicVertex current = q.poll();
-            for (BasicVertex neighbour : current.getNeighbours()) {
-                if (neighbour instanceof BasicStreet && ((BasicStreet) neighbour).getSpeedLimit() > 0 && !visited.contains(neighbour)) {
-                    visited.add(neighbour);
-                    q.add(neighbour);
-                    newComponent.add(neighbour);
-                }
-            }
-        }
+    public SparseMap getSiteMap() {
+        return siteMap;
     }
 
-    public SparseMap getSitemap() {
-        return sitemap;
-    }
-
-    public void setSitemap(SparseMap sitemap) {
-        this.sitemap = sitemap;
+    public void setSiteMap(SparseMap siteMap) {
+        this.siteMap = siteMap;
     }
 
     /*
@@ -187,7 +172,7 @@ public class SiteManager {
         zurück, im umgekehrten Fall gibt die Methode b zurück. Sind beide lexikographisch
         gleich, so wird a zurück gegeben.
          */
-    ArrayList<BasicVertex> getMinLexi(ArrayList<BasicVertex> a, ArrayList<BasicVertex> b) {
+    public ArrayList<BasicVertex> getMinLexi(ArrayList<BasicVertex> a, ArrayList<BasicVertex> b) {
         List<Integer> valuesA = new ArrayList<>();
         for (BasicVertex v : a) {
             valuesA.add(v.getValue());
@@ -208,6 +193,14 @@ public class SiteManager {
                 return b;
             }
         }
+
+        if (valuesA.size() < valuesB.size()) {
+            return a;
+        }else  if (valuesB.size() < valuesA.size()) {
+            return b;
+        }
+
+
         return a;
     }
 
@@ -228,78 +221,136 @@ public class SiteManager {
     zuvor zusammenhängende Straßennetz nun unzusammenhängend ist. Sie dürfen davon ausgehen, dass beim Testen dieser Methode 0 ≤ k ≤ 5 gilt, dass es nie mehr
     als 15 Straßenknoten in siteMap geben wird und dass die Anzahl an Zusammenhangskomponenten in siteMap bei Aufruf dieser Methode 1 ist.
      */
-    BasicStreet[] getCutSet(int k) {
-        List<BasicStreet> allStreets = new ArrayList<>();
-        for (BasicVertex[] row : sitemap.getVertexArray()) {
-            for (BasicVertex v : row) {
-                if (v instanceof BasicStreet) {
-                    allStreets.add((BasicStreet) v);
+    public BasicStreet[] getCutSet(int k) {
+        List<BasicStreet> allStreets = getAllStreets();
+        if (allStreets.size() > 15) {
+            throw new IllegalStateException("There should never be more than 15 road nodes in siteMap.");
+        }
+
+        List<List<BasicStreet>> combinations = new ArrayList<>();
+
+
+        List<BasicStreet> minLexiSet = null;
+        int originalComponents = countComponents();
+        generateCombinations(allStreets, new ArrayList<>(), combinations, k, originalComponents);
+
+        for (List<BasicStreet> combo : combinations) {
+            if (isValidCutSet(combo, originalComponents)) {
+                if (minLexiSet == null || isLexicographicallySmaller(combo, minLexiSet)) {
+                    minLexiSet = new ArrayList<>(combo);
                 }
             }
         }
 
-        List<List<BasicStreet>> validCombinations = new ArrayList<>();
-        generateCombinations(allStreets, new ArrayList<>(), validCombinations, k, 0);
-
-        List<BasicStreet> bestCombination = null;
-
-        for (List<BasicStreet> combination : validCombinations) {
-            if (isValidCutSet(combination)) {
-                if (bestCombination == null) {
-                    bestCombination = combination;
-                } else {
-                    ArrayList<BasicVertex> best = new ArrayList<>(bestCombination);
-                    ArrayList<BasicVertex> current = new ArrayList<>(combination);
-                    bestCombination = (List<BasicStreet>) (List<?>) getMinLexi(best, current);
-                }
-            }
-        }
-        if (bestCombination == null) {
+        if (minLexiSet == null) {
             return new BasicStreet[0];
         }
-        bestCombination.sort(Comparator.comparingInt(BasicVertex::getValue));
-        return new BasicStreet[0];
 
+        minLexiSet.sort(Comparator.comparingInt(BasicVertex::getValue));
+
+        return minLexiSet.toArray(new BasicStreet[0]);
     }
 
-
-    /*
-    Hilfsmethode für getCutSet(int k)
-     */
-    private void generateCombinations(List<BasicStreet> allStreets, List<BasicStreet> current, List<List<BasicStreet>> validCombinations, int k, int start) {
-        if (!current.isEmpty() && current.size() <= k) {
-            validCombinations.add(new ArrayList<>(current));
-        }
-        for (int i = start; i < allStreets.size(); i++) {
-            current.add(allStreets.get(i));
-            generateCombinations(allStreets, current, validCombinations, k, i + 1);
-            current.removeLast();
-        }
-    }
-
-    /*
-    Hilfsmethode für getCutSet(int k)
-     */
-    private boolean isValidCutSet(List<BasicStreet> combination) {
-        Set<BasicVertex> visited = new HashSet<>();
-        for (BasicStreet street : combination) {
-            for (BasicVertex neighbour : street.getNeighbours()) {
-                if (combination.contains(neighbour)) {
-                    return false;
+    private List<BasicStreet> getAllStreets() {
+        List<BasicStreet> streets = new ArrayList<>();
+        for (BasicVertex[] row : siteMap.getSparseVertexArray()) {
+            for (BasicVertex vertex : row) {
+                if (vertex instanceof BasicStreet) {
+                    streets.add((BasicStreet) vertex);
                 }
             }
         }
-        for (BasicStreet street : combination) {
-            sitemap.replaceVertex(street.getPosition(), new BasicGreen(street.getPosition().getRow(), street.getPosition().getColumn(), street.getValue()));
-        }
-
-        boolean result = countComponents() > 1;
-
-        for (BasicStreet street : combination) {
-            sitemap.replaceVertex(street.getPosition(), street);
-        }
-
-        return result;
+        return streets;
     }
 
+
+    /*
+    Hilfsmethode für getCutSet(int k)
+     */
+    private void generateCombinations(List<BasicStreet> allStreets, List<BasicStreet> current, List<List<BasicStreet>> combinations, int k,  int originalComponents) {
+        if (!current.isEmpty() && current.size() <= k) {
+            combinations.add(new ArrayList<>(current));
+        }
+        if (current.size() == k) {
+            return;
+        }
+        for (int i = 0; i < allStreets.size(); i++) {
+            BasicStreet street = allStreets.get(i);
+            if (current.isEmpty() || !current.contains(street)) {
+                List<BasicStreet> newCurrent = new ArrayList<>(current);
+                newCurrent.add(allStreets.get(i));
+                if (isStreetEffective(street, originalComponents)) {
+                    generateCombinations(allStreets, newCurrent, combinations, k, originalComponents);
+                }
+            }
+        }
+    }
+
+    private boolean isStreetEffective(BasicStreet street, int originalComponents) {
+        siteMap.replaceVertex(street.getPosition(), new BasicGreen(street.getPosition().getRow(), street.getPosition().getColumn(), street.getValue()));
+        int newComponents = countComponents();
+        siteMap.replaceVertex(street.getPosition(), street);
+
+        return newComponents > originalComponents;
+    }
+
+    /*
+    Hilfsmethode für getCutSet(int k)
+     */
+    private boolean isValidCutSet(List<BasicStreet> combo, int originalComponents) {
+        // Temporarily replace streets with greens
+        Map<BasicStreet, BasicVertex> originalVertices = new HashMap<>();
+        for (BasicStreet street : combo) {
+            originalVertices.put(street, siteMap.getBasicVertex(street.getPosition()).orElse(null));
+            siteMap.replaceVertex(street.getPosition(), new BasicGreen(street.getPosition().getRow(), street.getPosition().getColumn(), street.getValue()));
+        }
+
+        int newComponents = countComponents2();
+
+        for (Map.Entry<BasicStreet, BasicVertex> entry : originalVertices.entrySet()) {
+            siteMap.replaceVertex(entry.getKey().getPosition(), entry.getValue());
+        }
+
+        boolean isEffectiveCut = newComponents > originalComponents;
+        return isEffectiveCut;
+    }
+
+    private boolean isLexicographicallySmaller(List<BasicStreet> combo1, List<BasicStreet> combo2) {
+        for (int i = 0; i < Math.min(combo1.size(), combo2.size()); i++) {
+            if (combo1.get(i).getValue() != combo2.get(i).getValue()) {
+                return combo1.get(i).getValue() < combo2.get(i).getValue();
+            }
+        }
+        return combo1.size() < combo2.size();
+    }
+
+    int countComponents2() {
+        Set<BasicVertex> visited = new HashSet<>();
+        int components = 0;
+
+        for (int i = 0; i < siteMap.getSparseVertexArray().length; i++) {
+            for (int j = 0; j < siteMap.getSparseVertexArray()[i].length; j++) {
+                BasicVertex vertex = siteMap.getSparseVertexArray()[i][j];
+                if (vertex instanceof BasicStreet && !visited.contains(vertex)) {
+
+                    dfs(vertex, visited);
+                    components++;
+                }
+            }
+        }
+        return components;
+    }
+
+
+    private void dfs(BasicVertex vertex, Set<BasicVertex> visited) {
+
+        visited.add(vertex);
+
+        for (BasicVertex neighbor : vertex.getNeighbours()) {
+            if (neighbor instanceof BasicStreet && !visited.contains(neighbor)) {
+                dfs(neighbor, visited);
+            }
+        }
+    }
 }
+

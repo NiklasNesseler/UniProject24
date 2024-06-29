@@ -1,9 +1,6 @@
 package model.cameras;
 
-import model.BasicBuilding;
-import model.BasicVertex;
-import model.Position2D;
-import model.SparseMap;
+import model.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +23,10 @@ public class Camera {
     void initObservedVertices() {
         BasicVertex[][] vertexArray = observedMap.getSparseVertexArray();
         BasicVertex cameraVertex = vertexArray[position.getRow()][position.getColumn()];
+
+//        if (!(cameraVertex instanceof BasicStreet)) {
+//            throw new IllegalArgumentException("Cameras can only be placed on street nodes");
+//        }
 
         for (int negativeRangeRow = -range; negativeRangeRow <= range; negativeRangeRow++) {
             for (int negativeRangeCol = -range; negativeRangeCol <= range; negativeRangeCol++) {
