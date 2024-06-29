@@ -15,7 +15,7 @@ public class TimeStepper {
         this.subscribers = new ArrayList<>();
     }
 
-    void oneStepForward() {
+    public void oneStepForward() {
         if (timeStep < end) {
             timeStep++;
             updateSubscribers();
@@ -28,12 +28,12 @@ public class TimeStepper {
         }
     }
 
-    void addSubscriber(Car car) {
+    public void addSubscriber(Car car) {
         subscribers.add(car);
         subscribers.sort(Comparator.comparingInt(Car::getId));
     }
 
-    void removeSubscriber(Car car) {
+    public void removeSubscriber(Car car) {
         subscribers.remove(car);
     }
 

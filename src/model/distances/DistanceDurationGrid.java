@@ -35,24 +35,25 @@ public class DistanceDurationGrid {
     }
 
     private int spatialDistance(BasicVertex a, BasicVertex b) {
+        int distance;
         if (a.equals(b)) {
-            return 0;
+            distance = 0;
         } else if (a instanceof BasicStreet && b instanceof BasicStreet && a.getNeighbours().contains(b)) {
-            return 1200;
+            distance = 1200;
         } else if ((a instanceof BasicStreet || b instanceof BasicStreet) && a.getNeighbours().contains(b)) {
-            return 600;
+            distance = 600;
         } else if (!(a instanceof BasicStreet) && !(b instanceof BasicStreet) && a.getNeighbours().contains(b)) {
-            return 30;
-            
+            distance = 30;
         } else if (a.isBasicStreetConnectedTo(b)) {
-            return shortestSpatialPath(a, b);
-
+            distance = shortestSpatialPath(a, b);
         } else {
-            return Integer.MAX_VALUE;
+            distance = Integer.MAX_VALUE;
         }
+        return distance;
     }
 
-    private int shortestSpatialPath(BasicVertex a, BasicVertex b) {
+
+    int shortestSpatialPath(BasicVertex a, BasicVertex b) {
         return shortestPathDjikstra(a, b, true);
     }
 
@@ -113,28 +114,26 @@ public class DistanceDurationGrid {
     }
 
     private int temporalDistance(BasicVertex a, BasicVertex b) {
+        int duration;
         if (a.equals(b)) {
-            return 0;
+            duration = 0;
         } else if (a instanceof BasicStreet streetA && b instanceof BasicStreet streetB && a.getNeighbours().contains(b)) {
             if (streetA.getSpeedLimit() == 0 || streetB.getSpeedLimit() == 0) {
-                return Integer.MAX_VALUE;
+                duration = Integer.MAX_VALUE;
+            } else {
+                duration = (600 / streetA.getSpeedLimit()) + (600 / streetB.getSpeedLimit());
             }
-            else {
-                return (600 / streetA.getSpeedLimit()) + (600 / streetB.getSpeedLimit());
-            }
-            
         } else if (a.getNeighbours().contains(b)) {
-            return 5;
-
+            duration = 5;
         } else if (a.isBasicStreetConnectedTo(b)) {
-            return shortestTemporalPath(a, b);
-
+            duration = shortestTemporalPath(a, b);
         } else {
-            return Integer.MAX_VALUE;
+            duration = Integer.MAX_VALUE;
         }
+        return duration;
     }
 
-    private int shortestTemporalPath(BasicVertex a, BasicVertex b) {
+    int shortestTemporalPath(BasicVertex a, BasicVertex b) {
         return shortestPathDjikstra(a, b, false);
     }
 

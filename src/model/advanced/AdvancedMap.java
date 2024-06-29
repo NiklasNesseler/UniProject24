@@ -3,10 +3,7 @@ package model.advanced;
 import model.*;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class AdvancedMap{
     private AdvancedVertex[][] advancedVertexArray;
@@ -51,6 +48,7 @@ public class AdvancedMap{
                     int x = code / 10;
                     int y = code % 10;
 
+
                     AdvancedStreet.StreetTypes newStreetType = switch (x) {
                         case 1 -> AdvancedStreet.StreetTypes.CROSSING;
                         case 2 -> AdvancedStreet.StreetTypes.TJUNCTION;
@@ -73,7 +71,7 @@ public class AdvancedMap{
     }
 
     public boolean isAdvancedPath(ArrayList<AdvancedStreet> streetList) {
-        if (streetList == null || streetList.isEmpty() || streetList.size() < 3) {
+        if (streetList == null || streetList.isEmpty()) {
             return false;
         }
 
@@ -87,6 +85,11 @@ public class AdvancedMap{
             AdvancedStreet next = streetList.get(i + 1);
             if (visited.contains(next)) {
 //                System.out.println("Loop detected at: " + next.getPosition());
+                return false;
+            }
+
+            //Hier auch DUMMY verboten?
+            if (current.type.equals(AdvancedStreet.StreetTypes.CROSSING) || current.type.equals(AdvancedStreet.StreetTypes.TJUNCTION)) {
                 return false;
             }
 
@@ -118,6 +121,7 @@ public class AdvancedMap{
         if (r1 == r2 - 1 && c1 == c2) {
             return current.getParts()[2][1] && next.getParts()[0][1];
         }
+        System.out.println("Checking connection between " + current + " and " + next);
         return false;
     }
 
@@ -144,6 +148,73 @@ public class AdvancedMap{
         Set<AdvancedStreet> visited = new HashSet<>();
 
         return secondToLast.isAdvancedStreetConnectedTo(last, visited);
+    }
+
+    public int countAdvancedCircles() {
+        Set<AdvancedStreet> streets = new HashSet<>();
+
+        // Collect all AdvancedStreet objects in advancedVertexArray
+        for (int i = 0; i < advancedVertexArray.length; i++) {
+            for (int j = 0; j < advancedVertexArray[i].length; j++) {
+                if (advancedVertexArray[i][j] instanceof AdvancedStreet) {
+                    streets.add((AdvancedStreet) advancedVertexArray[i][j]);
+                }
+            }
+        }
+
+        int circleCount = 0;
+        Set<AdvancedStreet> visited = new HashSet<>();
+        Set<AdvancedStreet> visitedCircles = new HashSet<>();
+        Stack<AdvancedStreet> pathStack = new Stack<>();
+        for (AdvancedStreet street : streets) {
+            if (!visited.contains(street) && !visitedCircles.contains(street)) {
+                if (dfsDetectCycle(street, null, visited, pathStack, visitedCircles)) {
+                    ArrayList<AdvancedStreet> pathList = new ArrayList<>(pathStack);
+                    if (isAdvancedCircle(pathList)) {
+                        circleCount++;
+                        printCycle(pathList);
+                        visitedCircles.addAll(pathList);
+                    }
+                    pathStack.clear();
+                }
+            }
+        }
+        return circleCount;
+    }
+
+    private void printCycle(ArrayList<AdvancedStreet> pathStack) {
+        System.out.println("Cycle detected:");
+        for (AdvancedStreet street : pathStack) {
+            System.out.print("(" + street.getPosition().getRow() + ", " + street.getPosition().getColumn() + ") ");
+        }
+        System.out.println();
+    }
+
+    private boolean dfsDetectCycle(AdvancedStreet current, AdvancedStreet parent, Set<AdvancedStreet> visited, Stack<AdvancedStreet> pathStack, Set<AdvancedStreet> visitedCircles) {
+        visited.add(current);
+        pathStack.push(current);
+
+        for (AdvancedStreet neighbour : getAdvancedStreetNeighbours(current)) {
+            if (neighbour != parent && !visitedCircles.contains(neighbour)) {
+                if (visited.contains(neighbour)) {
+                    pathStack.push(neighbour);
+                    return true; // Potential cycle detected
+                } else if (dfsDetectCycle(neighbour, current, visited, pathStack, visitedCircles)) {
+                    return true; // Cycle detected in deeper call
+                }
+            }
+        }
+
+        pathStack.pop();
+        return false;
+    }
+
+    private boolean isValidCycle(Stack<AdvancedStreet> pathStack) {
+        ArrayList<AdvancedStreet> pathList = new ArrayList<>(pathStack);
+        if (isAdvancedCircle(pathList)) {
+            return true;
+        }
+        return false;
     }
 
     public boolean hasSkeleton() {

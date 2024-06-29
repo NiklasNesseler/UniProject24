@@ -20,25 +20,27 @@ public class DistanceTimeMap {
     public void initGrid() {
         this.grid = new DistanceDurationGrid(sparseMap);
     }
-    int computeDistance(BasicVertex start, BasicVertex end) {
+
+
+    public int computeDistance(BasicVertex start, BasicVertex end) {
         //nutze DistanceDurationGrid methoden
         LinkedHashMap<BasicVertex, Integer> startDistance = grid.getDistances().get(start);
         if (startDistance != null && startDistance.containsKey(end)) {
             return startDistance.get(end);
         }
-        return Integer.MAX_VALUE;
+        return grid.shortestSpatialPath(start, end);
     }
 
-    int computeDuration(BasicVertex start, BasicVertex end) {
+    public int computeDuration(BasicVertex start, BasicVertex end) {
         //nutze DistanceDurationGrid methoden
         LinkedHashMap<BasicVertex, Integer> startDuration = grid.getDurations().get(start);
         if (startDuration != null && startDuration.containsKey(end)) {
             return startDuration.get(end);
         }
-        return Integer.MAX_VALUE;
+        return grid.shortestTemporalPath(start, end);
     }
 
-    int computeDurationOfTrip(ArrayList<BasicVertex> vertexList) {
+    public int computeDurationOfTrip(ArrayList<BasicVertex> vertexList) {
         int fullDuration = 0;
 
         for (int i = 0; i < vertexList.size() - 1; i++) {

@@ -26,6 +26,7 @@ public class SiteManager {
             if (vertex.isPresent()) {
                 BasicVertex v = vertex.get();
                 Site site = new Site(position.getRow(), position.getColumn(), v.getValue(), 0);
+                site.setContainingMap(siteMap);
                 siteMap.replaceVertex(position, site);
             }
         }

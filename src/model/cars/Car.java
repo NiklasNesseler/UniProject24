@@ -22,7 +22,7 @@ public class Car {
         this.spawnPos = trip.getFirst();
     }
 
-    void update(int nextTimeStep) {
+    public void update(int nextTimeStep) {
         currentTime = nextTimeStep;
 
         if (currentTime < spawnTime) {
@@ -41,7 +41,7 @@ public class Car {
         }
     }
 
-    void onePositionBack() {
+    public void onePositionBack() {
         if (currentTime < spawnTime || currentPos.equals(new Position2D(-1, -1))) {
             return;
         }
