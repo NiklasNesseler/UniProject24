@@ -21,7 +21,7 @@ public class FleetController {
         }
     }
 
-    void runUntilTimeStep(int targetTimeStep) {
+    public void runUntilTimeStep(int targetTimeStep) {
         while (timeStepper.getTimeStep() < targetTimeStep) {
             timeStepper.oneStepForward();
             solveConflicts();

@@ -63,86 +63,42 @@ public class CameraManager {
         return true;
     }
 
-    ArrayList<BasicVertex> computeCover(int range, BasicVertexType type) {
-        ArrayList<BasicVertex> relevantVertices = new ArrayList<>();
+    public ArrayList<BasicVertex> computeCover(int range, BasicVertexType type) {
+        ArrayList<BasicVertex> candidateNodes = new ArrayList<>();
+        ArrayList<BasicVertex> streetNodes = new ArrayList<>();
+        BasicVertex[][] vertexArray = observedMap.getSparseVertexArray();
 
-        for (BasicVertex[] row : observedMap.getSparseVertexArray()) {
+        // 1. Collect candidate nodes and street nodes
+        for (BasicVertex[] row : vertexArray) {
             for (BasicVertex vertex : row) {
                 if (matchesType(vertex, type)) {
-                    relevantVertices.add(vertex);
+                    candidateNodes.add(vertex);
+                }
+                if (vertex instanceof BasicStreet) {
+                    streetNodes.add(vertex);
                 }
             }
         }
-        return findOptimalCover(relevantVertices, range);
-    }
 
-    private ArrayList<BasicVertex> findOptimalCover(ArrayList<BasicVertex> relevantVertices, int range) {
+        ArrayList<ArrayList<BasicVertex>> combinations = generateCombinations(candidateNodes, 5);
+
         ArrayList<BasicVertex> bestCover = new ArrayList<>();
-        for (int size = 1; size <= 5; size++) {
-            List<List<BasicVertex>> combinations = generateCombinations(relevantVertices, size);
-            for (List<BasicVertex> combination : combinations) {
-                if (coversAllStreets(combination, range)) {
-                    if (bestCover.isEmpty() || isBetterCombination(combination, bestCover)) {
-                        bestCover = new ArrayList<>(combination);
-                    }
-                }
-            }
-
-            if (!bestCover.isEmpty()) {
-                break;
+        for (ArrayList<BasicVertex> combination : combinations) {
+            if (coversAllStreets(combination, streetNodes, range) &&
+                    (bestCover.isEmpty() || combination.size() < bestCover.size() ||
+                            (combination.size() == bestCover.size() && isLexicographicallySmaller(combination, bestCover)))) {
+                bestCover = new ArrayList<>(combination);
             }
         }
+
         bestCover.sort(Comparator.comparingInt(BasicVertex::getValue));
+
         return bestCover;
-
-    }
-
-    private boolean isBetterCombination(List<BasicVertex> newCombination, ArrayList<BasicVertex> bestCover) {
-        List<Integer> newValues = newCombination.stream().map(BasicVertex::getValue).sorted().toList();
-        List<Integer> bestValues = bestCover.stream().map(BasicVertex::getValue).sorted().toList();
-
-        for (int i = 0; i < newValues.size(); i++) {
-            int compare = newValues.get(i).compareTo(bestValues.get(i));
-            if (compare < 0) {
-                return true;
-            } else if (compare > 0) {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    private boolean coversAllStreets(List<BasicVertex> combination, int range) {
-        ArrayList<Camera> cameras = new ArrayList<>();
-        for (BasicVertex vertex : combination) {
-            cameras.add(new Camera(range, vertex.getPosition(), observedMap));
-        }
-
-        return isCameraCover(cameras);
-    }
-
-    private List<List<BasicVertex>> generateCombinations(ArrayList<BasicVertex> relevantVertices, int size) {
-        List<List<BasicVertex>> combinations = new ArrayList<>();
-        generateCombinationsHelp(relevantVertices, new ArrayList<>(), combinations, size, 0);
-        return combinations;
-    }
-
-    private void generateCombinationsHelp(ArrayList<BasicVertex> relevantVertices, List<BasicVertex> current, List<List<BasicVertex>> result, int size, int start) {
-        if (current.size() == size) {
-            result.add(new ArrayList<>(current));
-            return;
-        }
-
-        for (int i = start; i < relevantVertices.size(); i++) {
-            current.add(relevantVertices.get(i));
-            generateCombinationsHelp(relevantVertices, current, result, size, i + 1);
-            current.removeLast();
-        }
     }
 
     private boolean matchesType(BasicVertex vertex, BasicVertexType type) {
         return switch (type) {
-            case BASICVERTEX -> vertex != null;
+            case BASICVERTEX -> true;
             case BASICSTREET -> vertex instanceof BasicStreet;
             case BASICBUILDING -> vertex instanceof BasicBuilding;
             case BASICGREEN -> vertex instanceof BasicGreen;
@@ -150,52 +106,117 @@ public class CameraManager {
         };
     }
 
-    ArrayList<BasicVertex> computeMinCover(int range) {
-        ArrayList<BasicVertex> allStreets = new ArrayList<>();
+    private ArrayList<ArrayList<BasicVertex>> generateCombinations(ArrayList<BasicVertex> nodes, int maxSize) {
+        ArrayList<ArrayList<BasicVertex>> result = new ArrayList<>();
+        for (int i = 1; i <= maxSize; i++) {
+            generateCombinationsHelp(nodes, i, 0, new ArrayList<>(), result);
+        }
+        return result;
+    }
 
-        for (BasicVertex[] row : observedMap.getSparseVertexArray()) {
-            for (BasicVertex vertex : row) {
-                if (vertex instanceof BasicStreet) {
-                    allStreets.add(vertex);
+    private void generateCombinationsHelp(ArrayList<BasicVertex> nodes, int k, int start,
+                                            ArrayList<BasicVertex> current, ArrayList<ArrayList<BasicVertex>> result) {
+        if (k == 0) {
+            result.add(new ArrayList<>(current));
+            return;
+        }
+        for (int i = start; i < nodes.size(); i++) {
+            current.add(nodes.get(i));
+            generateCombinationsHelp(nodes, k - 1, i + 1, current, result);
+            current.removeLast();
+        }
+    }
+
+    private boolean coversAllStreets(ArrayList<BasicVertex> cover, ArrayList<BasicVertex> streetNodes, int range) {
+        Set<BasicVertex> coveredStreets = new HashSet<>();
+        for (BasicVertex cameraNode : cover) {
+            for (BasicVertex streetNode : streetNodes) {
+                if (cameraNode.getBasicManhattanDistance(streetNode) <= range && isVisible(cameraNode, streetNode)) {
+                    coveredStreets.add(streetNode);
+                }
+            }
+        }
+        return coveredStreets.size() == streetNodes.size();
+    }
+
+    private boolean isVisible(BasicVertex start, BasicVertex end) {
+        BasicVertex[][] vertexArray = observedMap.getSparseVertexArray();
+        int startRow = start.getPosition().getRow();
+        int startCol = start.getPosition().getColumn();
+        int endRow = end.getPosition().getRow();
+        int endCol = end.getPosition().getColumn();
+
+        if (startRow == endRow) {
+            int minCol = Math.min(startCol, endCol);
+            int maxCol = Math.max(startCol, endCol);
+            for (int col = minCol + 1; col < maxCol; col++) {
+                if (vertexArray[startRow][col] instanceof BasicBuilding) {
+                    return false;
+                }
+            }
+        } else if (startCol == endCol) {
+            int minRow = Math.min(startRow, endRow);
+            int maxRow = Math.max(startRow, endRow);
+            for (int row = minRow + 1; row < maxRow; row++) {
+                if (vertexArray[row][startCol] instanceof BasicBuilding) {
+                    return false;
+                }
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isLexicographicallySmaller(ArrayList<BasicVertex> a, ArrayList<BasicVertex> b) {
+        for (int i = 0; i < Math.min(a.size(), b.size()); i++) {
+            int compare = Integer.compare(a.get(i).getValue(), b.get(i).getValue());
+            if (compare != 0) {
+                return compare < 0;
+            }
+        }
+        return a.size() < b.size();
+    }
+
+    public ArrayList<BasicVertex> computeMinCover(int range) {
+        ArrayList<BasicVertex> streetNodes = new ArrayList<>();
+        BasicVertex[][] vertexArray = observedMap.getSparseVertexArray();
+
+        for (BasicVertex[] basicVertices : vertexArray) {
+            for (BasicVertex basicVertex : basicVertices) {
+                if (basicVertex instanceof BasicStreet) {
+                    streetNodes.add(basicVertex);
                 }
             }
         }
 
-        return findOptimalCostCover(allStreets, range);
-    }
+        ArrayList<ArrayList<BasicVertex>> combinations = generateCombinations(streetNodes, 5);
 
-    private ArrayList<BasicVertex> findOptimalCostCover(ArrayList<BasicVertex> allStreets, int range) {
         ArrayList<BasicVertex> bestCover = new ArrayList<>();
         int minCost = Integer.MAX_VALUE;
 
-        for (int size = 1; size <= 5; size++) {
-            List<List<BasicVertex>> combinations = generateCombinations(allStreets, size);
-            for (List<BasicVertex> combination : combinations) {
-                if (coversAllStreets(combination, range)) {
-                    int cost = calculateTotalCost(combination);
-                    if (cost < minCost || (cost == minCost && isBetterCombination(combination, bestCover))) {
-                        minCost = cost;
-                        bestCover = new ArrayList<>(combination);
-
-                    }
+        for (ArrayList<BasicVertex> combination : combinations) {
+            if (coversAllStreets(combination, streetNodes, range)) {
+                int currentCost = calculateCost(combination);
+                if (currentCost < minCost ||
+                        (currentCost == minCost && combination.size() < bestCover.size()) ||
+                        (currentCost == minCost && combination.size() == bestCover.size() && isLexicographicallySmaller(combination, bestCover))) {
+                    bestCover = new ArrayList<>(combination);
+                    minCost = currentCost;
                 }
             }
-            if (!bestCover.isEmpty()) {
-                break;
-            }
         }
+
         bestCover.sort(Comparator.comparingInt(BasicVertex::getValue));
+
         return bestCover;
     }
 
-    private int calculateTotalCost(List<BasicVertex> combination) {
+    private int calculateCost(ArrayList<BasicVertex> cover) {
         int totalCost = 0;
-        for (BasicVertex vertex : combination) {
-            Position2D position = vertex.getPosition();
-            totalCost += cameraCosts[position.getRow()][position.getColumn()];
+        for (BasicVertex vertex : cover) {
+            totalCost += cameraCosts[vertex.getPosition().getRow()][vertex.getPosition().getColumn()];
         }
         return totalCost;
     }
-
-
 }

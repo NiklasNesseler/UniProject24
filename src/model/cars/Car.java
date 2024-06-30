@@ -11,6 +11,7 @@ public class Car {
     final Position2D spawnPos;
     private int currentTime;
     private Position2D currentPos;
+    private int tripIndex;
 
 
     public Car(int id, ArrayList<Position2D> trip, int spawnTime) {
@@ -20,6 +21,7 @@ public class Car {
         this.currentTime = 0;
         this.currentPos = new Position2D(-1, -1);
         this.spawnPos = trip.getFirst();
+        this.tripIndex = 0;
     }
 
     public void update(int nextTimeStep) {
@@ -35,9 +37,9 @@ public class Car {
             return;
         }
 
-        int current = trip.indexOf(currentPos);
-        if (current != -1 && current < trip.size() - 1) {
-            currentPos = trip.get(current + 1);
+        if (tripIndex < trip.size() - 1) {
+            tripIndex++;
+            currentPos = trip.get(tripIndex);
         }
     }
 
@@ -46,9 +48,9 @@ public class Car {
             return;
         }
 
-        int current = trip.indexOf(currentPos);
-        if (current > 0) {
-            currentPos = trip.get(current - 1);
+        if (tripIndex > 0) {
+            tripIndex--;
+            currentPos = trip.get(tripIndex);
         } else {
             currentPos = spawnPos;
         }

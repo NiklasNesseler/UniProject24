@@ -22,14 +22,17 @@ public class AdvancedMap{
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 BasicVertex basicVertex = vertexArray[i][j];
-                if (basicVertex instanceof BasicStreet) {
-                    advancedVertexArray[i][j] = new AdvancedStreet(i, j, basicVertex.getValue(), AdvancedStreet.StreetTypes.DUMMY);
-                } else if (basicVertex instanceof BasicGreen) {
-                    advancedVertexArray[i][j] = new AdvancedGreen(i, j, basicVertex.getValue());
-                } else if (basicVertex instanceof BasicBuilding) {
-                    advancedVertexArray[i][j] = new AdvancedBuilding(i, j, basicVertex.getValue());
-                } else {
-                    advancedVertexArray[i][j] = new AdvancedVertex(i, j, basicVertex.getValue());
+                switch (basicVertex) {
+                    case BasicStreet street ->
+                            advancedVertexArray[i][j] = new AdvancedStreet(i, j, basicVertex.getValue(), AdvancedStreet.StreetTypes.DUMMY);
+                    case BasicGreen basicGreen ->
+                            advancedVertexArray[i][j] = new AdvancedGreen(i, j, basicVertex.getValue());
+                    case BasicBuilding building ->
+                            advancedVertexArray[i][j] = new AdvancedBuilding(i, j, basicVertex.getValue());
+                    case null, default -> {
+                        assert basicVertex != null;
+                        advancedVertexArray[i][j] = new AdvancedVertex(i, j, basicVertex.getValue());
+                    }
                 }
 
                 if (advancedVertexArray[i][j] != null) {
@@ -43,7 +46,7 @@ public class AdvancedMap{
         for (int i = 0; i < streetCodes.length; i++) {
             for (int j = 0; j < streetCodes[i].length; j++) {
                 AdvancedVertex vertex = advancedVertexArray[i][j];
-                if (vertex instanceof AdvancedStreet && ((AdvancedStreet) vertex).type == AdvancedStreet.StreetTypes.DUMMY) {
+                if (vertex instanceof AdvancedStreet street && ((AdvancedStreet) vertex).type == AdvancedStreet.StreetTypes.DUMMY) {
                     int code = streetCodes[i][j];
                     int x = code / 10;
                     int y = code % 10;
@@ -58,7 +61,6 @@ public class AdvancedMap{
                         default -> throw new IllegalArgumentException("Unknown street type: " + x);
                     };
 
-                    AdvancedStreet street = (AdvancedStreet) vertex;
                     street.type = newStreetType;
                     street.initParts(newStreetType);
 
@@ -84,7 +86,6 @@ public class AdvancedMap{
             AdvancedStreet current = streetList.get(i);
             AdvancedStreet next = streetList.get(i + 1);
             if (visited.contains(next)) {
-//                System.out.println("Loop detected at: " + next.getPosition());
                 return false;
             }
 
@@ -94,8 +95,6 @@ public class AdvancedMap{
             }
 
             if (!areStreetsConnected(current, next)) {
-//                System.out.println("Disconnection detected between " + current.getPosition().getRow() + ", " + current.getPosition().getColumn() +
-//                " and " + next.getPosition().getRow() + "," + next.getPosition().getColumn());
                 return false;
             }
 
@@ -121,14 +120,10 @@ public class AdvancedMap{
         if (r1 == r2 - 1 && c1 == c2) {
             return current.getParts()[2][1] && next.getParts()[0][1];
         }
-        System.out.println("Checking connection between " + current + " and " + next);
         return false;
     }
 
     public boolean isAdvancedCircle(ArrayList<AdvancedStreet> streetList) {
-        //ist erster = letzter
-        // ist Path für alle bis auf letzten?
-        // verknüpfung zwischen vorletzten und letzten street
         if (streetList == null || streetList.isEmpty() || streetList.size() < 5) {
             return false;
         }
@@ -153,11 +148,10 @@ public class AdvancedMap{
     public int countAdvancedCircles() {
         Set<AdvancedStreet> streets = new HashSet<>();
 
-        // Collect all AdvancedStreet objects in advancedVertexArray
-        for (int i = 0; i < advancedVertexArray.length; i++) {
-            for (int j = 0; j < advancedVertexArray[i].length; j++) {
-                if (advancedVertexArray[i][j] instanceof AdvancedStreet) {
-                    streets.add((AdvancedStreet) advancedVertexArray[i][j]);
+        for (AdvancedVertex[] advancedVertices : advancedVertexArray) {
+            for (AdvancedVertex advancedVertex : advancedVertices) {
+                if (advancedVertex instanceof AdvancedStreet) {
+                    streets.add((AdvancedStreet) advancedVertex);
                 }
             }
         }
@@ -211,20 +205,17 @@ public class AdvancedMap{
 
     private boolean isValidCycle(Stack<AdvancedStreet> pathStack) {
         ArrayList<AdvancedStreet> pathList = new ArrayList<>(pathStack);
-        if (isAdvancedCircle(pathList)) {
-            return true;
-        }
-        return false;
+        return isAdvancedCircle(pathList);
     }
 
     public boolean hasSkeleton() {
         Set<AdvancedStreet> streets = new HashSet<>();
 
         // Collect all AdvancedStreet objects in advancedVertexArray
-        for (int i = 0; i < advancedVertexArray.length; i++) {
-            for (int j = 0; j < advancedVertexArray[i].length; j++) {
-                if (advancedVertexArray[i][j] instanceof AdvancedStreet) {
-                    streets.add((AdvancedStreet) advancedVertexArray[i][j]);
+        for (AdvancedVertex[] advancedVertices : advancedVertexArray) {
+            for (AdvancedVertex advancedVertex : advancedVertices) {
+                if (advancedVertex instanceof AdvancedStreet) {
+                    streets.add((AdvancedStreet) advancedVertex);
                 }
             }
         }
@@ -237,9 +228,9 @@ public class AdvancedMap{
         for (AdvancedStreet street : streets) {
             int count = 0;
             boolean[][] parts = street.getParts();
-            for (int x = 0; x < parts.length; x++) {
-                for (int y = 0; y < parts[x].length; y++) {
-                    if (parts[x][y]) {
+            for (boolean[] part : parts) {
+                for (boolean b : part) {
+                    if (b) {
                         count++;
                     }
                 }
