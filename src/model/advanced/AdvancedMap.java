@@ -2,16 +2,30 @@ package model.advanced;
 
 import model.*;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
+
+/**
+ * Represents an advanced version of a basic map
+ */
 public class AdvancedMap{
+    /**
+     * 2D array of advanced vertices representing the advanced map
+     */
     private AdvancedVertex[][] advancedVertexArray;
 
+    /**
+     * Constructor of the AdvancedMap from the BasicMap
+     * @param basicMap used to construct the advanced map
+     */
     public AdvancedMap(BasicMap basicMap) {
         initRefinement(basicMap);
     }
 
+    /**
+     * Initializes the advancedVertexArray
+     * @param basicMap object
+     */
     void initRefinement(BasicMap basicMap) {
         BasicVertex[][] vertexArray = basicMap.getVertexArray();
         int rows = vertexArray.length;
@@ -42,6 +56,11 @@ public class AdvancedMap{
         }
     }
 
+
+    /**
+     * builds the advanced streets in the advanced map using the specific street types
+     * @param streetCodes differentiating the different street types
+     */
     public void buildAdvancedStreets(int[][] streetCodes) {
         for (int i = 0; i < streetCodes.length; i++) {
             for (int j = 0; j < streetCodes[i].length; j++) {
@@ -72,6 +91,11 @@ public class AdvancedMap{
         }
     }
 
+    /**
+     * Checks if a list of streets forms an advanced path
+     * @param streetList list of streets possibly representing a path
+     * @return true if list is an advanced path, false otherwise
+     */
     public boolean isAdvancedPath(ArrayList<AdvancedStreet> streetList) {
         if (streetList == null || streetList.isEmpty()) {
             return false;
@@ -102,6 +126,12 @@ public class AdvancedMap{
         return true;
     }
 
+    /**
+     * Helper Method checking if two advanced streets are connected
+     * @param current the current street
+     * @param next the next street
+     * @return true if the streets are connected, false otherwise
+     */
     private boolean areStreetsConnected(AdvancedStreet current, AdvancedStreet next) {
         int r1 = current.getPosition().getRow();
         int c1 = current.getPosition().getColumn();
@@ -123,6 +153,12 @@ public class AdvancedMap{
         return false;
     }
 
+
+    /**
+     * Checks if a list of advanced streets forms an advanced circle
+     * @param streetList list of streets, possibly representing a circle
+     * @return
+     */
     public boolean isAdvancedCircle(ArrayList<AdvancedStreet> streetList) {
         if (streetList == null || streetList.isEmpty() || streetList.size() < 5) {
             return false;
@@ -145,69 +181,94 @@ public class AdvancedMap{
         return secondToLast.isAdvancedStreetConnectedTo(last, visited);
     }
 
+    /**
+     * Count the number of advanced circles in the advanced map
+     * @return the number of advanced circles
+     */
     public int countAdvancedCircles() {
-        Set<AdvancedStreet> streets = new HashSet<>();
-
-        for (AdvancedVertex[] advancedVertices : advancedVertexArray) {
-            for (AdvancedVertex advancedVertex : advancedVertices) {
-                if (advancedVertex instanceof AdvancedStreet) {
-                    streets.add((AdvancedStreet) advancedVertex);
-                }
-            }
-        }
-
-        int circleCount = 0;
         Set<AdvancedStreet> visited = new HashSet<>();
-        Set<AdvancedStreet> visitedCircles = new HashSet<>();
-        Stack<AdvancedStreet> pathStack = new Stack<>();
-        for (AdvancedStreet street : streets) {
-            if (!visited.contains(street) && !visitedCircles.contains(street)) {
-                if (dfsDetectCycle(street, null, visited, pathStack, visitedCircles)) {
-                    ArrayList<AdvancedStreet> pathList = new ArrayList<>(pathStack);
-                    if (isAdvancedCircle(pathList)) {
+        int circleCount = 0;
+
+        for (AdvancedVertex[] row : advancedVertexArray) {
+            for (AdvancedVertex vertex : row) {
+                if (vertex instanceof AdvancedStreet street && !visited.contains(street)) {
+                    ArrayList<AdvancedStreet> path = new ArrayList<>();
+                    if (dfsCircle(street, street, path, visited)) {
                         circleCount++;
-                        printCycle(pathList);
-                        visitedCircles.addAll(pathList);
                     }
-                    pathStack.clear();
                 }
             }
         }
+
         return circleCount;
     }
 
-    private void printCycle(ArrayList<AdvancedStreet> pathStack) {
-        System.out.println("Cycle detected:");
-        for (AdvancedStreet street : pathStack) {
-            System.out.print("(" + street.getPosition().getRow() + ", " + street.getPosition().getColumn() + ") ");
+    /**
+     * depth first search to find advanced circles in the advanced map
+     * @param start starting street vertex
+     * @param current current street vertex
+     * @param path current path
+     * @param visited set of visited streets
+     * @return true if a circle is found, false otherwise
+     */
+    private boolean dfsCircle(AdvancedStreet start, AdvancedStreet current, ArrayList<AdvancedStreet> path, Set<AdvancedStreet> visited) {
+        visited.add(current);
+        path.add(current);
+
+        for (AdvancedStreet neighbor : getAdvancedStreetNeighborsAsList(current)) {
+            if (!visited.contains(neighbor)) {
+                if (dfsCircle(start, neighbor, path, visited)) {
+                    return true;
+                }
+            } else if (neighbor.equals(start) && path.size() > 2) {
+                path.add(start);
+                return isAdvancedCircle(path);
+            }
         }
-        System.out.println();
+
+        path.removeLast();
+        return false;
     }
 
-    private boolean dfsDetectCycle(AdvancedStreet current, AdvancedStreet parent, Set<AdvancedStreet> visited, Stack<AdvancedStreet> pathStack, Set<AdvancedStreet> visitedCircles) {
-        visited.add(current);
-        pathStack.push(current);
+    /**
+     * Gets a list of neighbouring streets connected to a given street
+     * @param street given streets
+     * @return a list of connected neighbouring streets
+     */
+    private List<AdvancedStreet> getAdvancedStreetNeighborsAsList(AdvancedStreet street) {
+        List<AdvancedStreet> neighbors = new ArrayList<>();
+        int row = street.getPosition().getRow();
+        int col = street.getPosition().getColumn();
 
-        for (AdvancedStreet neighbour : getAdvancedStreetNeighbours(current)) {
-            if (neighbour != parent && !visitedCircles.contains(neighbour)) {
-                if (visited.contains(neighbour)) {
-                    pathStack.push(neighbour);
-                    return true; // Potential cycle detected
-                } else if (dfsDetectCycle(neighbour, current, visited, pathStack, visitedCircles)) {
-                    return true; // Cycle detected in deeper call
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        for (int[] dir : directions) {
+            int newRow = row + dir[0];
+            int newCol = col + dir[1];
+            if (isValidPosition(newRow, newCol) && advancedVertexArray[newRow][newCol] instanceof AdvancedStreet neighbor) {
+                if (areStreetsConnected(street, neighbor)) {
+                    neighbors.add(neighbor);
                 }
             }
         }
 
-        pathStack.pop();
-        return false;
+        return neighbors;
     }
 
-    private boolean isValidCycle(Stack<AdvancedStreet> pathStack) {
-        ArrayList<AdvancedStreet> pathList = new ArrayList<>(pathStack);
-        return isAdvancedCircle(pathList);
+    /**
+     * Helper method finding out if the given position is valid in the vertex array
+     * @param row row index
+     * @param col column index
+     * @return true if the position is valid, false otherwise
+     */
+    private boolean isValidPosition(int row, int col) {
+        return row >= 0 && row < advancedVertexArray.length && col >= 0 && col < advancedVertexArray[0].length;
     }
 
+
+    /**
+     * Checks if advanced map has a skeleton
+     * @return true if the map has a skeleton, false otherwise
+     */
     public boolean hasSkeleton() {
         Set<AdvancedStreet> streets = new HashSet<>();
 
@@ -263,7 +324,11 @@ public class AdvancedMap{
     }
 
 
-
+    /**
+     * Gets the set of neighbouring streets that are connected to a given street
+     * @param street where we want to find the neighbours
+     * @return a set of connected neighbours
+     */
     private Set<AdvancedStreet> getAdvancedStreetNeighbours(AdvancedStreet street) {
         Set<AdvancedStreet> neighbours = new HashSet<>();
         int row = street.getPosition().getRow();
@@ -285,6 +350,11 @@ public class AdvancedMap{
     }
 
 
+    /**
+     * Checks if the 4th requirement of a skeleton from the lecture is met
+     * @param street the street to be checked
+     * @return true if requirement is met, false otherwise
+     */
     private boolean skeletonReq4(AdvancedStreet street) {
         boolean[][] parts = street.getParts();
         int row = street.getPosition().getRow();
@@ -337,6 +407,10 @@ public class AdvancedMap{
     }
 
 
+    /**
+     * Lists the most frequent type of vertex objects in the advanced map
+     * @return a sorted list of the most frequent type of vertex objects
+     */
     public ArrayList<? extends AdvancedVertex> listMostFrequentType() {
         int streetCount = 0;
         int buildingCount = 0;
@@ -387,10 +461,17 @@ public class AdvancedMap{
     }
 
 
+    /**
+     * @return the advanced vertex array
+     */
     public AdvancedVertex[][] getAdvancedVertexArray() {
         return advancedVertexArray;
     }
 
+    /**
+     * Sets the advanced vertex array
+     * @param advancedVertexArray array to be set
+     */
     public void setAdvancedVertexArray(AdvancedVertex[][] advancedVertexArray) {
         this.advancedVertexArray = advancedVertexArray;
     }

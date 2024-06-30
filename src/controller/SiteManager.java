@@ -8,17 +8,19 @@ import model.sites.Site;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
+/**
+ * Class to manage Construction Sites in the SparseMap
+ */
 public class SiteManager {
     SparseMap siteMap;
     public SiteManager(SparseMap siteMap) {
         this.siteMap = siteMap;
     }
 
-    /*
-    Ersetzt in siteMap alle Knoten, deren Position einer Position aus positionList
-    entspricht, mit einem Baustellenknoten. Dabei werden die Position und der valueWert des Knotens, der ersetzt wird, übernommen und das speedLimit wird auf 0
-    gesetzt.
-    Es können auch Nicht-Straßenknoten mit Baustellenknoten ersetzt werden.
+    /**
+     * Replaces all vertices in Sitemap which are in positionList with Construction Sites
+     * @param positionList the List of Vertices to be replaced
      */
     public void putSites(ArrayList<Position2D> positionList) {
         for (Position2D position : positionList) {
@@ -32,14 +34,10 @@ public class SiteManager {
         }
     }
 
-    /*
-    Sei S+ die Menge aller Straßenknoten aus siteMap, deren speedLimit-Wert größer
-    als 0 ist. Sei z die Anzahl der Zusammenhangskomponenten, die von S+ gebildet
-    werden.
-    Die Methode gibt genau dann true zurück, wenn gilt: Ersetzt man alle Knoten, die
-    sich auf einer angegebenen Position in positionList befinden, mit Baustellenknoten, dann erhöht z sich um mindestens 1.
-    Die Methode soll sozusagen die Frage beantworten, ob die Straßenzüge der Stadt
-    durch die entsprechenden Baustellen in noch mehr „Einzelteile“ zerhackt werden.
+    /**
+     * Checks if replacing Vertices with Sites Disconnects street components
+     * @param positionList list of vertices to be replaced
+     * @return true if components go up by at least 1 when vertices get replaced
      */
     public boolean isDisconnectedSet(ArrayList<Position2D> positionList) {
         Map<Position2D, BasicVertex> originalVertices = new HashMap<>();
@@ -68,9 +66,9 @@ public class SiteManager {
     }
 
 
-
-    /*
-    Hilfsmethode für isDisconnectedSet(ArrayList<Position2D> positionList)
+    /**
+     * Helper method for isDisconnectedSet
+     * @return the number of components
      */
     private int countComponents() {
         Set<BasicVertex> visited = new HashSet<>();
@@ -90,8 +88,11 @@ public class SiteManager {
         return components;
     }
 
-    /*
-    Hilfsmethode für isDisconnectedSet(ArrayList<Position2D> positionList)
+    /**
+     * depth first search to help find components
+     * @param v current vertex
+     * @param visited List of visited vertices
+     * @param component List of vertices in current component
      */
     private void dfs(BasicVertex v, Set<BasicVertex> visited, List<BasicVertex> component) {
         visited.add(v);
@@ -104,17 +105,10 @@ public class SiteManager {
         }
     }
 
-    /*
-    Sei S+ die Menge aller Straßenknoten aus siteMap, deren speedLimit-Wert größer
-    als 0 ist. Seien Z1, ..., Zn die Zusammenhangskomponenten, die von S+ gebildet werden. Diese Methode gibt genau dann true zurück, wenn für alle Zi
-    , i = 1, ..., n, gilt,
-    dass mindestens ein Straßenknoten a aus Zi zu einem Krankenhaus und mindestens
-    ein Straßenknoten b aus Zi zu einer Polizeistation benachbart sind. Dabei dürfen a
-    und b auch identisch sein.
-    Sie dürfen davon ausgehen, dass es immer mindestens einen Straßenknoten in
-    siteMap gibt. Diese Methode soll sozusagen die Frage beantworten, ob Sicherheit
-    und Gesundheit der Bevölkerung trotz der entsprechend platzierten Baustellen, also
-    nicht mehr befahrbaren Straßen, gewährleistet ist.
+    /**
+     * Checks if every component has a police station and a hospital
+     * @return true if every component has a street connected
+     * to a police station and a street connected to a hospital, false otherwise
      */
     public boolean hasValidSites() {
         List<List<BasicVertex>> components = getComponents();
@@ -138,8 +132,9 @@ public class SiteManager {
         return true;
     }
 
-    /*
-    Hilfsmethode für hasValidSites()
+    /**
+     * Helper Method for hasValidSites()
+     * @return all the components
      */
     List<List<BasicVertex>> getComponents() {
         Set<BasicVertex> visited = new HashSet<>();
@@ -166,13 +161,12 @@ public class SiteManager {
         this.siteMap = siteMap;
     }
 
-    /*
-        Sortiert man aufsteigend einmal die value-Werte der Knoten aus a und einmal die
-        value-Werte der Knoten aus b, so seien V (a) und V (b) die daraus resultierenden
-        Zahlenfolgen. Ist V (a) lexikographisch kleiner als V (b), dann gibt die Methode a
-        zurück, im umgekehrten Fall gibt die Methode b zurück. Sind beide lexikographisch
-        gleich, so wird a zurück gegeben.
-         */
+    /**
+     * Checks for the lexicographically smaller ArrayList
+     * @param a ArrayList of BasicVertices
+     * @param b the other ArrayList of BasicVertices
+     * @return the smaller ArrayList
+     */
     public ArrayList<BasicVertex> getMinLexi(ArrayList<BasicVertex> a, ArrayList<BasicVertex> b) {
         List<Integer> valuesA = new ArrayList<>();
         for (BasicVertex v : a) {
@@ -206,21 +200,21 @@ public class SiteManager {
     }
 
 
-
-    /*
-    Diese Methode berechnet eine Menge M von Straßenknoten, die folgende Bedingungen erfüllt:
-    (1) M enthält höchstens k Straßenknoten.
-    (2) Die Straßenknoten in M sind untereinander nicht benachbart.
-    (3) Ersetzt man alle Straßenknoten, die in M gespeichert sind, in siteMap mit
-    Grünflächen, so erhöht sich die Anzahl der BasicStreet-Zusammenhangskomponenten in siteMap von 1 auf mindestens 2.
-    (4) Sortiert man alle Knoten-Mengen, welche die vorgenannten Bedingungen erfüllen, aufsteigend nach value-Wert der Knoten, dann ist die für M resultierende
-    Folge von value-Werten die lexikographisch kleinste.
-    (5) M ist aufsteigend nach value-Wert der Knoten sortiert.
-    Gibt es keine solche Menge M, dann wird ein leeres Array zurückgegeben.
-    Diese Methode beantwortet sozusagen die Frage, wie eine Menge von k nicht
-    miteinander verbundenen Straßenknoten aussehen kann, die dafür sorgt, dass das
-    zuvor zusammenhängende Straßennetz nun unzusammenhängend ist. Sie dürfen davon ausgehen, dass beim Testen dieser Methode 0 ≤ k ≤ 5 gilt, dass es nie mehr
-    als 15 Straßenknoten in siteMap geben wird und dass die Anzahl an Zusammenhangskomponenten in siteMap bei Aufruf dieser Methode 1 ist.
+    /**
+     * Computes a set of street nodes that, when replaced with green spaces, increases the number
+     * of connected components in the siteMap from 1 to at least 2.
+     * The set must meet the following conditions:
+     * <ol>
+     *     <li>Contains at most k street nodes.</li>
+     *     <li>The street nodes in the set are not adjacent to each other.</li>
+     *     <li>Replacing the street nodes in the set with green spaces increases the number of connected components in the siteMap from 1 to at least 2.</li>
+     *     <li>The set is lexicographically smallest when sorted by the value of the nodes.</li>
+     *     <li>The set is sorted in ascending order by the value of the nodes.</li>
+     * </ol>
+     *
+     * @param k the maximum number of street nodes to include in the set
+     * @return an array of BasicStreet objects representing the cut set, or an empty array if no such set exists
+     * @throws IllegalStateException if there are more than 15 road nodes in the siteMap
      */
     public BasicStreet[] getCutSet(int k) {
         List<BasicStreet> allStreets = getAllStreets();
@@ -265,8 +259,14 @@ public class SiteManager {
     }
 
 
-    /*
-    Hilfsmethode für getCutSet(int k)
+    /**
+     * Generates all combinations of street nodes up to a specified size and stores them in a list.
+     *
+     * @param allStreets the list of all street nodes
+     * @param current the current combination of street nodes
+     * @param combinations the list to store all generated combinations
+     * @param k the maximum size of the combinations
+     * @param originalComponents the original number of components in the siteMap
      */
     private void generateCombinations(List<BasicStreet> allStreets, List<BasicStreet> current, List<List<BasicStreet>> combinations, int k,  int originalComponents) {
         if (!current.isEmpty() && current.size() <= k) {
@@ -287,6 +287,14 @@ public class SiteManager {
         }
     }
 
+
+    /**
+     * Checks if replacing a given street node with a green space increases the number of components in the siteMap.
+     *
+     * @param street the street node to be replaced
+     * @param originalComponents the original number of components in the siteMap
+     * @return true if replacing the street node increases the number of components, false otherwise
+     */
     private boolean isStreetEffective(BasicStreet street, int originalComponents) {
         siteMap.replaceVertex(street.getPosition(), new BasicGreen(street.getPosition().getRow(), street.getPosition().getColumn(), street.getValue()));
         int newComponents = countComponents();
@@ -295,8 +303,12 @@ public class SiteManager {
         return newComponents > originalComponents;
     }
 
-    /*
-    Hilfsmethode für getCutSet(int k)
+    /**
+     * Checks if a combination of street nodes forms a valid cut set that increases the number of components in the siteMap.
+     *
+     * @param combo the combination of street nodes
+     * @param originalComponents the original number of components in the siteMap
+     * @return true if the combination forms a valid cut set, false otherwise
      */
     private boolean isValidCutSet(List<BasicStreet> combo, int originalComponents) {
         // Temporarily replace streets with greens
@@ -316,6 +328,14 @@ public class SiteManager {
         return isEffectiveCut;
     }
 
+
+    /**
+     * Compares two lists of street nodes lexicographically.
+     *
+     * @param combo1 the first list of street nodes
+     * @param combo2 the second list of street nodes
+     * @return true if the first list is lexicographically smaller, false otherwise
+     */
     private boolean isLexicographicallySmaller(List<BasicStreet> combo1, List<BasicStreet> combo2) {
         for (int i = 0; i < Math.min(combo1.size(), combo2.size()); i++) {
             if (combo1.get(i).getValue() != combo2.get(i).getValue()) {
@@ -325,6 +345,11 @@ public class SiteManager {
         return combo1.size() < combo2.size();
     }
 
+    /**
+     * Counts the number of connected components in the siteMap considering only street nodes.
+     *
+     * @return the number of connected components
+     */
     int countComponents2() {
         Set<BasicVertex> visited = new HashSet<>();
         int components = 0;
@@ -343,6 +368,12 @@ public class SiteManager {
     }
 
 
+    /**
+     * Performs a depth first search  to mark all reachable street nodes from a given starting vertex.
+     *
+     * @param vertex the starting vertex
+     * @param visited the set of already visited vertices
+     */
     private void dfs(BasicVertex vertex, Set<BasicVertex> visited) {
 
         visited.add(vertex);

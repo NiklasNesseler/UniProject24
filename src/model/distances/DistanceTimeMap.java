@@ -3,8 +3,7 @@ package model.distances;
 import model.BasicVertex;
 import model.SparseMap;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 public class DistanceTimeMap {
     private SparseMap sparseMap;
@@ -21,28 +20,16 @@ public class DistanceTimeMap {
         this.grid = new DistanceDurationGrid(sparseMap);
     }
 
-
     public int computeDistance(BasicVertex start, BasicVertex end) {
-        //nutze DistanceDurationGrid methoden
-        LinkedHashMap<BasicVertex, Integer> startDistance = grid.getDistances().get(start);
-        if (startDistance != null && startDistance.containsKey(end)) {
-            return startDistance.get(end);
-        }
-        return grid.shortestSpatialPath(start, end);
+        return bfs(start, end, true);
     }
 
     public int computeDuration(BasicVertex start, BasicVertex end) {
-        //nutze DistanceDurationGrid methoden
-        LinkedHashMap<BasicVertex, Integer> startDuration = grid.getDurations().get(start);
-        if (startDuration != null && startDuration.containsKey(end)) {
-            return startDuration.get(end);
-        }
-        return grid.shortestTemporalPath(start, end);
+        return bfs(start, end, false);
     }
 
     public int computeDurationOfTrip(ArrayList<BasicVertex> vertexList) {
-        int fullDuration = 0;
-
+        int totalDuration = 0;
         for (int i = 0; i < vertexList.size() - 1; i++) {
             BasicVertex current = vertexList.get(i);
             BasicVertex next = vertexList.get(i + 1);
@@ -50,14 +37,42 @@ public class DistanceTimeMap {
             if (duration == Integer.MAX_VALUE) {
                 return Integer.MAX_VALUE;
             }
-
-            fullDuration += duration;
-
+            totalDuration += duration;
         }
+        return totalDuration;
+    }
 
-        return fullDuration;
+    public int bfs(BasicVertex start, BasicVertex end, boolean isDistance) {
+        Queue<BasicVertex> q = new LinkedList<>();
+        HashMap<BasicVertex, Integer> distances = new HashMap<>();
+        HashMap<BasicVertex, BasicVertex> p = new HashMap<>();
+
+        q.offer(start);
+        distances.put(start, 0);
+
+        while (!q.isEmpty()) {
+            BasicVertex current = q.poll();
+            if (current.equals(end)) {
+                return distances.get(current);
+            }
+
+            for (BasicVertex neighbour : current.getNeighbours()) {
+                int weight = isDistance ?
+                        grid.getDistances().get(current).get(neighbour) : grid.getDurations().get(current).get(neighbour);
+
+                int newDistance = distances.get(current) + weight;
+                if (!distances.containsKey(neighbour) || newDistance < distances.get(neighbour)) {
+                    distances.put(neighbour, newDistance);
+                    p.put(neighbour, current);
+                    q.offer(neighbour);
+                }
+
+            }
+        }
+        return Integer.MAX_VALUE;
 
     }
+
 
     public SparseMap getSparseMap() {
         return sparseMap;
