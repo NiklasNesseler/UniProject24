@@ -108,9 +108,16 @@ public class SparseController {
         }
 
         for (BasicStreet street : streetsList) {
-            if (street.getNeighbours().size() > maxDeg) {
+            int streetNeighbourCount = 0;
+            for (BasicVertex neighbour : street.getNeighbours()) {
+                if (neighbour instanceof BasicStreet) {
+                    streetNeighbourCount++;
+            }}
+            if (streetNeighbourCount > maxDeg) {
                 return false;
             }
+
+
         }
 
         return true;
