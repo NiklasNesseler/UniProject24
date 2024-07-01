@@ -4,15 +4,16 @@ import model.BasicBuilding;
 
 public class Hospital extends BasicBuilding {
     /**
-     * Erstellt ein neues BasicBuilding-Objekt mit spezifizierten Positionskoordinaten, einem Wert und einer Höhe.
-     * Dieser Konstruktor initialisiert die Position und den Wert des Gebäudes über den Superklassenkonstruktor
-     * und setzt die Höhe des Gebäudes.
+     * Creates a new BasicBuilding object with specified position coordinates, a value and a height.
+     * This constructor initializes the position and the value of the building via the superclass constructor
+     * and sets the height of the building.
      *
-     * @param row    Die Zeilenposition des Gebäudes in der Karte.
-     * @param column Die Spaltenposition des Gebäudes in der Karte.
-     * @param value  Der Wert des Gebäudes, der für verschiedene Zwecke verwendet werden kann.
-     * @param height Die Höhe des Gebäudes in Stockwerken.
+     * @param row The row position of the building in the map.
+     * @param column The column position of the building in the map.
+     * @param value The value of the building, which can be used for various purposes.
+     * @param height The height of the building in floors.
      */
+
     public Hospital(int row, int column, int value, int height) {
         super(row, column, value, height);
     }

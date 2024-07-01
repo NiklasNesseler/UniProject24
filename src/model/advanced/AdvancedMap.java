@@ -62,6 +62,10 @@ public class AdvancedMap{
      * @param streetCodes differentiating the different street types
      */
     public void buildAdvancedStreets(int[][] streetCodes) {
+        if (streetCodes == null || streetCodes.length != advancedVertexArray.length
+                || streetCodes[0].length != advancedVertexArray[0].length) {
+            throw new IllegalArgumentException("Invalid streetCodes dimensions");
+        }
         for (int i = 0; i < streetCodes.length; i++) {
             for (int j = 0; j < streetCodes[i].length; j++) {
                 AdvancedVertex vertex = advancedVertexArray[i][j];
@@ -91,6 +95,8 @@ public class AdvancedMap{
         }
     }
 
+
+
     /**
      * Checks if a list of streets forms an advanced path
      * @param streetList list of streets possibly representing a path
@@ -114,7 +120,8 @@ public class AdvancedMap{
             }
 
             //Hier auch DUMMY verboten?
-            if (current.type.equals(AdvancedStreet.StreetTypes.CROSSING) || current.type.equals(AdvancedStreet.StreetTypes.TJUNCTION)) {
+            if (current.type.equals(AdvancedStreet.StreetTypes.CROSSING) || current.type.equals(AdvancedStreet.StreetTypes.TJUNCTION)
+            || current.type.equals(AdvancedStreet.StreetTypes.DUMMY)) {
                 return false;
             }
 
@@ -160,7 +167,7 @@ public class AdvancedMap{
      * @return
      */
     public boolean isAdvancedCircle(ArrayList<AdvancedStreet> streetList) {
-        if (streetList == null || streetList.isEmpty() || streetList.size() < 5) {
+        if (streetList == null || streetList.isEmpty() || streetList.size() < 4) {
             return false;
         }
         AdvancedStreet first = streetList.getFirst();
@@ -287,18 +294,9 @@ public class AdvancedMap{
         }
         //2
         for (AdvancedStreet street : streets) {
-            int count = 0;
-            boolean[][] parts = street.getParts();
-            for (boolean[] part : parts) {
-                for (boolean b : part) {
-                    if (b) {
-                        count++;
-                    }
-                }
-            }
-            if (count < 2) {
+            if (street.type.equals(AdvancedStreet.StreetTypes.DUMMY))
+
                 return false;
-            }
         }
 
         //3 und 4
@@ -308,6 +306,7 @@ public class AdvancedMap{
                 if (areStreetsConnected(street, neighbour)) {
                     neighbourFound = true;
                 } else {
+
                     return false;
                 }
             }

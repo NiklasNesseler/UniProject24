@@ -7,29 +7,53 @@ import model.sites.Site;
 
 import java.util.*;
 
-//TODO: OFFENE FRAGEN: Muss bei isCrucialPath() der sparseVertexArray zurückersetzt werden?
-//TODO: Wie ist isCircle genau definiert? Kann in der VertexList auch ein Punkt 2 mal vorkommen?
 
+
+/**
+ * The SparseMap class extends BasicMap and implements DensityChecker.
+ * It represents a sparse map and provides methods to manipulate and query the map.
+ */
 public class SparseMap extends BasicMap implements DensityChecker {
+    /** The sparse vertex array representing the map. */
     private BasicVertex[][] sparseVertexArray;
 
+    /**
+     * Constructs a SparseMap with the specified base data.
+     *
+     * @param baseData the base data for initializing the map
+     */
     public SparseMap(int[][] baseData) {
         super(baseData);
         initSparseVertexArray();
     }
 
+    /**
+     * Initializes the sparse vertex array with the vertex array from the superclass.
+     */
     private void initSparseVertexArray() {
         sparseVertexArray = getVertexArray();
     }
 
+    /**
+     * @return the sparse vertex array
+     */
     public BasicVertex[][] getSparseVertexArray() {
         return sparseVertexArray;
     }
 
+    /**
+     * Sets the sparse vertex array.
+     * @param sparseVertexArray the new sparse vertex array
+     */
     public void setSparseVertexArray(BasicVertex[][] sparseVertexArray) {
         this.sparseVertexArray = sparseVertexArray;
     }
 
+    /**
+     * Replaces buildings at the specified positions with hospitals
+     *
+     * @param hospitals the positions where hospitals should be placed
+     */
     public void putHospitals(ArrayList<Position2D> hospitals) {
         for (Position2D position : hospitals) {
             BasicVertex existingBuilding = sparseVertexArray[position.getRow()][position.getColumn()];
@@ -42,6 +66,11 @@ public class SparseMap extends BasicMap implements DensityChecker {
 
     }
 
+    /**
+     * Replaces buildings at the specified positions with police stations
+     *
+     * @param policeStations the positions where police stations should be placed
+     */
     public void putPoliceStations(ArrayList<Position2D> policeStations) {
         for (Position2D position : policeStations) {
             BasicVertex existingBuilding = sparseVertexArray[position.getRow()][position.getColumn()];
@@ -55,6 +84,11 @@ public class SparseMap extends BasicMap implements DensityChecker {
     }
 
 
+    /**
+     * Computes all squares in the sparse vertex array and returns them in a sorted TreeSet
+     *
+     * @return a sorted TreeSet of squares
+     */
     public TreeSet<Square> computeAllSquares() {
         TreeSet<Square> squares = new TreeSet<>();
         for (int i = 0; i < sparseVertexArray.length - 1; i++) {
@@ -70,6 +104,11 @@ public class SparseMap extends BasicMap implements DensityChecker {
 
 
 
+    /**
+     * Checks if the map is connected by streets.
+     *
+     * @return true if the map is connected by streets, false otherwise
+     */
     public boolean isBasicStreetConnectedMap() {
         BasicVertex start = null;
 
@@ -127,18 +166,41 @@ public class SparseMap extends BasicMap implements DensityChecker {
     }
 
 
+    /**
+     * Helper method that checks if a valid square can be formed with the specified anchor vertex.
+     *
+     * @param anchor the anchor vertex
+     * @param i the row index
+     * @param j the column index
+     * @return true if a valid square can be formed, false otherwise
+     */
     private boolean isValidSquare(BasicVertex anchor, int i, int j) {
         return sparseVertexArray[i][j + 1] != null &&
                 sparseVertexArray[i + 1][j + 1] != null &&
                 sparseVertexArray[i + 1][j] != null;
     }
 
+
+    /**
+     * Counts the number of common vertices between two lists of vertices.
+     *
+     * @param x the first list of vertices
+     * @param y the second list of vertices
+     * @return the number of common vertices
+     */
     public int countCommonVertices(ArrayList<BasicVertex> x, ArrayList<BasicVertex> y) {
         Set<BasicVertex> setX = new HashSet<>(x);
         setX.retainAll(y);
         return setX.size();
     }
 
+    /**
+     * Checks if subtrip is a subpath of trip.
+     *
+     * @param trip the main trip
+     * @param subtrip the subtrip to check
+     * @return true if subtrip is a subpath of trip, false otherwise
+     */
     public boolean isSubtrip(ArrayList<BasicVertex> trip, ArrayList<BasicVertex> subtrip) {
         if (subtrip.isEmpty()) return true;
         if (subtrip.size() > trip.size()) return false;
@@ -158,6 +220,12 @@ public class SparseMap extends BasicMap implements DensityChecker {
     }
 
 
+    /**
+     * Checks if the vertices with the specified value are connected.
+     *
+     * @param connectValue the value to check for connectivity
+     * @return true if the vertices with the specified value are connected, false otherwise
+     */
     public boolean isConnectedByValue(int connectValue) {
         List<BasicVertex> vertexWithValue = new ArrayList<>();
         for (BasicVertex[] row : sparseVertexArray) {
@@ -169,7 +237,6 @@ public class SparseMap extends BasicMap implements DensityChecker {
         }
         if (vertexWithValue.isEmpty()) return true;
 
-        //BFS
         Set<BasicVertex> visited = new HashSet<>();
         Queue<BasicVertex> queue = new LinkedList<>();
         queue.add(vertexWithValue.getFirst());
@@ -189,6 +256,12 @@ public class SparseMap extends BasicMap implements DensityChecker {
     }
 
 
+    /**
+     * Checks if the specified path is a crucial path.
+     *
+     * @param vertexList the list of vertices representing the path
+     * @return true if the path is crucial, false otherwise
+     */
     public boolean isCrucialPath(ArrayList<BasicVertex> vertexList) {
         if (vertexList.size() < 2) {
             return false;
@@ -218,6 +291,11 @@ public class SparseMap extends BasicMap implements DensityChecker {
     }
 
 
+    /**
+     * Checks if the map represents a closed world.
+     *
+     * @return true if the map is a closed world, false otherwise
+     */
     public boolean isClosedWorld() {
         if (!isBasicStreetConnectedMap()) {
         return false; }
@@ -247,6 +325,12 @@ public class SparseMap extends BasicMap implements DensityChecker {
     }
 
 
+    /**
+     * Checks if the specified list of vertices forms a circle.
+     *
+     * @param vertexList the list of vertices
+     * @return true if the list forms a circle, false otherwise
+     */
     public boolean isCircle(ArrayList<BasicVertex> vertexList) {
         if (vertexList == null || vertexList.size() < 4) {
 
@@ -266,6 +350,16 @@ public class SparseMap extends BasicMap implements DensityChecker {
 
     }
 
+
+    /**
+     * Performs a depth first search to check if the list of vertices forms a circle.
+     *
+     * @param vertexList the list of vertices
+     * @param i the current index in the list
+     * @param visited the set of visited vertices
+     * @param start the starting vertex
+     * @return true if the list forms a circle, false otherwise
+     */
     private boolean dfs(ArrayList<BasicVertex> vertexList, int i, Set<BasicVertex> visited, BasicVertex start) {
         if (i == vertexList.size() - 1) {
             return true;
@@ -285,6 +379,11 @@ public class SparseMap extends BasicMap implements DensityChecker {
     }
 
 
+    /**
+     * Checks if all streets in the map form a circle.
+     *
+     * @return true if all streets form a circle, false otherwise
+     */
     public boolean isCircle() {
         if (!areAllStreetsConnected()) {
 
@@ -317,6 +416,13 @@ public class SparseMap extends BasicMap implements DensityChecker {
         return isCircle(new ArrayList<>(vertexList));
     }
 
+
+    /**
+     * Finds a path that includes all streets in the map.
+     *
+     * @param streets the list of streets
+     * @return the list of vertices representing the path
+     */
     private List<BasicVertex> findPath(List<BasicStreet> streets) {
         if (streets.isEmpty()) {
             return Collections.emptyList();
@@ -332,6 +438,16 @@ public class SparseMap extends BasicMap implements DensityChecker {
         return path;
     }
 
+    /**
+     * Performs a depth first search to find a path that includes all streets.
+     *
+     * @param current the current vertex
+     * @param start the starting vertex
+     * @param visited the set of visited vertices
+     * @param path the path being constructed
+     * @param recursionStack the recursion stack
+     * @return true if a path is found, false otherwise
+     */
     private boolean dfs2(BasicVertex current, BasicVertex start, Set<BasicVertex> visited, List<BasicVertex> path, Set<BasicVertex> recursionStack) {
         visited.add(current);
         path.add(current);
@@ -355,6 +471,11 @@ public class SparseMap extends BasicMap implements DensityChecker {
     }
 
 
+    /**
+     * Checks if all streets in the map are connected.
+     *
+     * @return true if all streets are connected, false otherwise
+     */
     private boolean areAllStreetsConnected() {
         for (BasicVertex[] row : getSparseVertexArray()) {
             for (BasicVertex vertex : row) {
@@ -368,6 +489,12 @@ public class SparseMap extends BasicMap implements DensityChecker {
         return true;
     }
 
+    /**
+     * Checks if a street vertex is connected to another street.
+     *
+     * @param street the street vertex
+     * @return true if the street is connected to another street, false otherwise
+     */
     private boolean isConnectedToAnotherStreet(BasicVertex street) {
         List<BasicVertex> neighbours = street.getNeighbours();
 
@@ -380,25 +507,29 @@ public class SparseMap extends BasicMap implements DensityChecker {
     }
 
 
+    /**
+     * Checks if the specified vertex list forms a tour with the given stops.
+     *
+     * @param vertexList the list of vertices
+     * @param stops the list of stops
+     * @return true if the vertex list forms a tour, false otherwise
+     */
     public boolean isTour(ArrayList<BasicVertex> vertexList, ArrayList<BasicVertex> stops) {
         if (vertexList == null || stops == null || stops.isEmpty() || vertexList.isEmpty()) {
             return false;
         }
 
-        //1
         Set<BasicVertex> stopSet = new HashSet<>(stops);
         if (stopSet.size() != stops.size()) {
 
             return false;
         }
 
-        //2
         if (!isCircle(vertexList)) {
 
             return false;
         }
 
-        //3
         for (BasicVertex vertex : vertexList) {
             if (!stopSet.contains(vertex) && !(vertex instanceof BasicStreet)) {
 
@@ -406,12 +537,10 @@ public class SparseMap extends BasicMap implements DensityChecker {
             }
         }
 
-        //4
         if (!vertexList.getFirst().equals(stops.getFirst())) {
             return false;
         }
 
-        //5
         Set<BasicVertex> visitedStops = new HashSet<>();
         int stopIndex = 0;
         for (int i = 0; i < vertexList.size() - 1; i++) {
@@ -436,6 +565,12 @@ public class SparseMap extends BasicMap implements DensityChecker {
     }
 
 
+
+    /**
+     * Replaces a vertex with a BasicGreen vertex.
+     *
+     * @param vertex the vertex to replace
+     */
     private void replaceWithBasicGreen(BasicVertex vertex) {
         int row = vertex.getPosition().getRow();
         int column = vertex.getPosition().getColumn();
@@ -443,13 +578,48 @@ public class SparseMap extends BasicMap implements DensityChecker {
         sparseVertexArray[row][column] = basicGreen;
     }
 
+    /**
+     * Resets a position to its original vertex.
+     *
+     * @param position2D the position
+     * @param originalVertex the original vertex
+     */
     private void resetBackToBasicStreet(Position2D position2D, BasicVertex originalVertex) {
         sparseVertexArray[position2D.getRow()][position2D.getColumn()] = originalVertex;
     }
 
 
+    /**
+     * Replaces a vertex at a given position with a new vertex.
+     *
+     * @param position the position of the vertex
+     * @param newVertex the new vertex to replace the old vertex
+     */
     public void replaceVertex(Position2D position, BasicVertex newVertex) {
         sparseVertexArray[position.getRow()][position.getColumn()] = newVertex;
+    }
+
+    public boolean areStreetConnected(BasicVertex a, BasicVertex b) {
+        if (a == b) return true;
+
+        Queue<BasicVertex> q = new LinkedList<>();
+        Set<BasicVertex> visited = new HashSet<>();
+
+        q.offer(a);
+        visited.add(a);
+
+        while (!q.isEmpty()){
+            BasicVertex current = q.poll();
+            if (current == b) return true;
+
+            for (BasicVertex neighbour : current.getNeighbours()) {
+                if (!visited.contains(neighbour) && neighbour instanceof BasicStreet || neighbour == b) {
+                    q.offer(neighbour);
+                    visited.add(neighbour);
+                }
+            }
+        }
+        return false;
     }
 
 
