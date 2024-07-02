@@ -292,7 +292,7 @@ public class SiteManager {
 
     private boolean isAdjacent(BasicStreet street, List<BasicStreet> current) {
         for (BasicStreet s : current) {
-            if (areDirectNeighbors(street, s)) {
+            if (areDirectNeighbours(street, s)) {
                 return true;
             }
         }
@@ -302,7 +302,7 @@ public class SiteManager {
     private boolean containsAdjacentNodes(List<BasicStreet> combination) {
         for (int i = 0; i < combination.size(); i++) {
             for (int j = i + 1; j < combination.size(); j++) {
-                if (areDirectNeighbors(combination.get(i), combination.get(j))) {
+                if (areDirectNeighbours(combination.get(i), combination.get(j))) {
                     return true;
                 }
             }
@@ -310,7 +310,7 @@ public class SiteManager {
         return false;
     }
 
-    private boolean areDirectNeighbors(BasicStreet s1, BasicStreet s2) {
+    private boolean areDirectNeighbours(BasicStreet s1, BasicStreet s2) {
         // Check if two streets are directly adjacent
         int rowDiff = Math.abs(s1.getPosition().getRow() - s2.getPosition().getRow());
         int colDiff = Math.abs(s1.getPosition().getColumn() - s2.getPosition().getColumn());
