@@ -69,7 +69,7 @@ public class AdvancedMap{
         for (int i = 0; i < streetCodes.length; i++) {
             for (int j = 0; j < streetCodes[i].length; j++) {
                 AdvancedVertex vertex = advancedVertexArray[i][j];
-                if (vertex instanceof AdvancedStreet street && ((AdvancedStreet) vertex).type == AdvancedStreet.StreetTypes.DUMMY) {
+                if (vertex instanceof AdvancedStreet street && ((AdvancedStreet) vertex).getType() == AdvancedStreet.StreetTypes.DUMMY) {
                     int code = streetCodes[i][j];
                     int x = code / 10;
                     int y = code % 10;
@@ -84,7 +84,7 @@ public class AdvancedMap{
                         default -> throw new IllegalArgumentException("Unknown street type: " + x);
                     };
 
-                    street.type = newStreetType;
+                    street.setType(newStreetType);
                     street.initParts(newStreetType);
 
                     for (int k = 0; k < y; k++) {
@@ -120,8 +120,8 @@ public class AdvancedMap{
             }
 
             //Hier auch DUMMY verboten?
-            if (current.type.equals(AdvancedStreet.StreetTypes.CROSSING) || current.type.equals(AdvancedStreet.StreetTypes.TJUNCTION)
-            || current.type.equals(AdvancedStreet.StreetTypes.DUMMY)) {
+            if (current.getType().equals(AdvancedStreet.StreetTypes.CROSSING) || current.getType().equals(AdvancedStreet.StreetTypes.TJUNCTION)
+            || current.getType().equals(AdvancedStreet.StreetTypes.DUMMY)) {
                 return false;
             }
 
@@ -294,7 +294,7 @@ public class AdvancedMap{
         }
         //2
         for (AdvancedStreet street : streets) {
-            if (street.type.equals(AdvancedStreet.StreetTypes.DUMMY))
+            if (street.getType().equals(AdvancedStreet.StreetTypes.DUMMY))
 
                 return false;
         }

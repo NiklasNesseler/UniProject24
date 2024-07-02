@@ -53,6 +53,7 @@ public class SiteManager {
 
 
 
+
         int initialComponents = countComponents();
         for (Position2D position : positionList) {
             siteMap.replaceVertex(position, originalVertices.get(position));
@@ -64,6 +65,7 @@ public class SiteManager {
         //Fragt mich nicht warum aber das funktioniert
         return newComponents < initialComponents;
     }
+
 
 
     /**
@@ -324,8 +326,7 @@ public class SiteManager {
             siteMap.replaceVertex(entry.getKey().getPosition(), entry.getValue());
         }
 
-        boolean isEffectiveCut = newComponents > originalComponents;
-        return isEffectiveCut;
+        return newComponents > originalComponents;
     }
 
 
@@ -384,5 +385,7 @@ public class SiteManager {
             }
         }
     }
+
+
 }
 

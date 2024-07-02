@@ -54,27 +54,6 @@ public class DistanceDurationGrid {
     }
 
     /**
-     * Calculates the spatial distance between two vertices
-     * @param a vertice a
-     * @param b vertice b
-     * @return the spatial difference as an int
-     */
-    private int spatialDistance(BasicVertex a, BasicVertex b) {
-        if (a.equals(b)) return 0;
-        if (a instanceof BasicStreet && b instanceof BasicStreet) {
-            return 1200;
-        }
-        if (a instanceof BasicStreet || b instanceof BasicStreet) {
-            return 600;
-        }
-        //TODO: Make this work
-        if (!a.isBasicStreetConnectedTo(b)){
-            return Integer.MAX_VALUE;
-        }
-        return 30;
-    }
-
-    /**
      * Initializes the spatial distances between vertices
      */
     void initDistances() {
@@ -93,21 +72,48 @@ public class DistanceDurationGrid {
     }
 
     /**
+     * Calculates the spatial distance between two vertices
+     * @param a vertice a
+     * @param b vertice b
+     * @return the spatial difference as an int
+     */
+    private int spatialDistance(BasicVertex a, BasicVertex b) {
+        if (a.equals(b)) {
+            return 0;
+        }
+        if (!a.isBasicStreetConnectedTo(b)) {
+            return Integer.MAX_VALUE;
+        }
+
+        if (a instanceof BasicStreet && b instanceof BasicStreet) {
+            return 1200;
+        }
+        if (a instanceof BasicStreet || b instanceof BasicStreet) {
+            return 600;
+        }
+
+        return 30;
+    }
+
+
+
+    /**
      * Calculates the temporal distances between two vertices
      * @param a vertice a
      * @param b vertice b
      * @return the temporal distance as an int
      */
     private int temporalDistance(BasicVertex a, BasicVertex b) {
-        if (a.equals(b)) return 0;
+        if (a.equals(b)) {
+            return 0;
+        }
+        if (!a.isBasicStreetConnectedTo(b)) {
+            return Integer.MAX_VALUE;
+        }
         if (!(a instanceof BasicStreet) || !(b instanceof BasicStreet)) {
             return 5;
         }
 
-        //TODO: Make this work
-        if (!a.isBasicStreetConnectedTo(b)){
-            return Integer.MAX_VALUE;
-        }
         int sa = ((BasicStreet) a).getSpeedLimit();
         int sb = ((BasicStreet) b).getSpeedLimit();
         if (sa == 0 || sb == 0) {

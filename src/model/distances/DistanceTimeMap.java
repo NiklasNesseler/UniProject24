@@ -1,5 +1,6 @@
 package model.distances;
 
+import model.BasicStreet;
 import model.BasicVertex;
 import model.SparseMap;
 
@@ -83,38 +84,40 @@ public class DistanceTimeMap {
      * @param isDistance true to compute spatial distance, false to compute temporal distance
      * @return the computed distance or duration between the start and end vertices
      */
-    public int bfs(BasicVertex start, BasicVertex end, boolean isDistance) {
+    private int bfs(BasicVertex start, BasicVertex end, boolean isDistance) {
         if (!sparseMap.areStreetConnected(start, end)) {
             return Integer.MAX_VALUE;
         }
-        Queue<BasicVertex> q = new LinkedList<>();
-        HashMap<BasicVertex, Integer> distances = new HashMap<>();
-        HashMap<BasicVertex, BasicVertex> p = new HashMap<>();
+        Queue<BasicVertex> queue = new LinkedList<>();
+        Map<BasicVertex, Integer> distances = new HashMap<>();
+        Set<BasicVertex> visited = new HashSet<>();
 
-        q.offer(start);
+        queue.offer(start);
         distances.put(start, 0);
 
-        while (!q.isEmpty()) {
-            BasicVertex current = q.poll();
-            if (current.equals(end)) {
-                return distances.get(current);
-            }
+        while (!queue.isEmpty()) {
+            BasicVertex current = queue.poll();
+            visited.add(current);
 
             for (BasicVertex neighbour : current.getNeighbours()) {
+                if (!current.equals(start) && !neighbour.equals(end) && !(neighbour instanceof BasicStreet)) {
+                    continue;
+                }
                 int weight = isDistance ?
                         grid.getDistances().get(current).get(neighbour) : grid.getDurations().get(current).get(neighbour);
+
+                if (weight == Integer.MAX_VALUE) {
+                    continue;
+                }
 
                 int newDistance = distances.get(current) + weight;
                 if (!distances.containsKey(neighbour) || newDistance < distances.get(neighbour)) {
                     distances.put(neighbour, newDistance);
-                    p.put(neighbour, current);
-                    q.offer(neighbour);
+                    queue.offer(neighbour);
                 }
-
             }
         }
-        return Integer.MAX_VALUE;
-
+        return distances.getOrDefault(end, Integer.MAX_VALUE);
     }
 
 

@@ -23,7 +23,7 @@ public class AdvancedStreet extends AdvancedVertex {
         CURVE,
         NEEDLE
     }
-    StreetTypes type;
+    private StreetTypes type;
 
     /**
      * Constructor of the AdvancedStreet with the specified parameters

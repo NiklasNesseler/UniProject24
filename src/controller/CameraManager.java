@@ -205,7 +205,7 @@ public class CameraManager {
 
 
     /**
-     * Check if all Streets are Covered by Cameras
+     * Helper Function for ComputeCover and ComputeMinCover that checks if all Streets are Covered by Cameras
      * @param cover the combination of vertices
      * @param streetNodes the list of street vertices
      * @param range the camera range
@@ -225,7 +225,7 @@ public class CameraManager {
 
 
     /**
-     * Checks for Visibility as Buildings obstruct sight
+     * Helper Function for CoversAllStreets that checks for Visibility as Buildings obstruct sight
      * @param start starting vertex
      * @param end ending vertex
      * @return true if the line of sight is open, false otherwise
@@ -261,7 +261,7 @@ public class CameraManager {
 
 
     /**
-     * Compares 2 Lists of BasicVertices Lexicographically
+     * Helper function for ComputeCover and ComputeMinCover that compares 2 Lists of BasicVertices Lexicographically
      * @param a 1 of the compared Lists
      * @param b The other of the compared Lists
      * @return true if a is lexicographically smaller, false otherwise
@@ -319,7 +319,7 @@ public class CameraManager {
 
 
     /**
-     * Calculate COsts of placing a camera on a BasicVertex
+     * Helper Function for ComputeMinCover that calculates COsts of placing a camera on a BasicVertex
      * @param cover list of cover vertices
      * @return the total cost of placing camera on the cover vertices
      */
