@@ -44,7 +44,37 @@ public class DistanceTimeMap {
      * @return the spatial distance in int
      */
     public int computeDistance(BasicVertex start, BasicVertex end) {
-        return bfs(start, end, true);
+        if (!sparseMap.areStreetConnected(start, end)) {
+            return Integer.MAX_VALUE;
+        }
+
+        Queue<BasicVertex> queue = new LinkedList<>();
+        Map<BasicVertex, Integer> distances = new HashMap<>();
+        Set<BasicVertex> visited = new HashSet<>();
+
+        queue.offer(start);
+        distances.put(start, 0);
+
+        while (!queue.isEmpty()) {
+            BasicVertex current = queue.poll();
+            visited.add(current);
+
+            if (current.equals(end)) {
+                return distances.get(current);
+            }
+
+            for (BasicVertex neighbour : current.getNeighbours()) {
+                if (!visited.contains(neighbour) && (neighbour instanceof BasicStreet || neighbour.equals(end))) {
+                    int newDistance = distances.get(current) + grid.getDistances().get(current).get(neighbour);
+                    if (!distances.containsKey(neighbour) || newDistance < distances.get(neighbour)) {
+                        distances.put(neighbour, newDistance);
+                        queue.offer(neighbour);
+                    }
+                }
+            }
+        }
+
+        return Integer.MAX_VALUE; // If no path is found
     }
 
     /**
