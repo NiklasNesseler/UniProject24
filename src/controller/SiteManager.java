@@ -14,12 +14,14 @@ import java.util.stream.Collectors;
  */
 public class SiteManager {
     SparseMap siteMap;
+
     public SiteManager(SparseMap siteMap) {
         this.siteMap = siteMap;
     }
 
     /**
      * Replaces all vertices in Sitemap which are in positionList with Construction Sites
+     *
      * @param positionList the List of Vertices to be replaced
      */
     public void putSites(ArrayList<Position2D> positionList) {
@@ -36,6 +38,7 @@ public class SiteManager {
 
     /**
      * Checks if replacing Vertices with Sites Disconnects street components
+     *
      * @param positionList list of vertices to be replaced
      * @return true if components go up by at least 1 when vertices get replaced
      */
@@ -52,8 +55,6 @@ public class SiteManager {
         }
 
 
-
-
         int initialComponents = countComponents();
         for (Position2D position : positionList) {
             siteMap.replaceVertex(position, originalVertices.get(position));
@@ -61,18 +62,17 @@ public class SiteManager {
         int newComponents = countComponents();
 
 
-
         //Fragt mich nicht warum aber das funktioniert
         return newComponents < initialComponents;
     }
 
 
-
     /**
      * Helper method for isDisconnectedSet
+     *
      * @return the number of components
      */
-    private int countComponents() {
+    int countComponents() {
         Set<BasicVertex> visited = new HashSet<>();
         int components = 0;
 
@@ -92,8 +92,9 @@ public class SiteManager {
 
     /**
      * depth first search to help find components
-     * @param v current vertex
-     * @param visited List of visited vertices
+     *
+     * @param v         current vertex
+     * @param visited   List of visited vertices
      * @param component List of vertices in current component
      */
     private void dfs(BasicVertex v, Set<BasicVertex> visited, List<BasicVertex> component) {
@@ -109,6 +110,7 @@ public class SiteManager {
 
     /**
      * Checks if every component has a police station and a hospital
+     *
      * @return true if every component has a street connected
      * to a police station and a street connected to a hospital, false otherwise
      */
@@ -136,6 +138,7 @@ public class SiteManager {
 
     /**
      * Helper Method for hasValidSites()
+     *
      * @return all the components
      */
     List<List<BasicVertex>> getComponents() {
@@ -165,6 +168,7 @@ public class SiteManager {
 
     /**
      * Checks for the lexicographically smaller ArrayList
+     *
      * @param a ArrayList of BasicVertices
      * @param b the other ArrayList of BasicVertices
      * @return the smaller ArrayList
@@ -193,7 +197,7 @@ public class SiteManager {
 
         if (valuesA.size() < valuesB.size()) {
             return a;
-        }else  if (valuesB.size() < valuesA.size()) {
+        } else if (valuesB.size() < valuesA.size()) {
             return b;
         }
 
@@ -264,36 +268,60 @@ public class SiteManager {
     /**
      * Generates all combinations of street nodes up to a specified size and stores them in a list.
      *
-     * @param allStreets the list of all street nodes
-     * @param current the current combination of street nodes
-     * @param combinations the list to store all generated combinations
-     * @param k the maximum size of the combinations
+     * @param allStreets         the list of all street nodes
+     * @param current            the current combination of street nodes
+     * @param combinations       the list to store all generated combinations
+     * @param k                  the maximum size of the combinations
      * @param originalComponents the original number of components in the siteMap
      */
-    private void generateCombinations(List<BasicStreet> allStreets, List<BasicStreet> current, List<List<BasicStreet>> combinations, int k,  int originalComponents) {
-        if (!current.isEmpty() && current.size() <= k) {
+    private void generateCombinations(List<BasicStreet> allStreets, List<BasicStreet> current, List<List<BasicStreet>> combinations, int k, int originalComponents) {
+        if (current.size() > 0 && current.size() <= k && !containsAdjacentNodes(current)) {
             combinations.add(new ArrayList<>(current));
         }
-        if (current.size() == k) {
-            return;
-        }
-        for (int i = 0; i < allStreets.size(); i++) {
+        if (current.size() == k) return;
+        int lastAddedIndex = allStreets.indexOf(current.isEmpty() ? null : current.get(current.size() - 1));
+        for (int i = lastAddedIndex + 1; i < allStreets.size(); i++) {
             BasicStreet street = allStreets.get(i);
-            if (current.isEmpty() || !current.contains(street)) {
+            if (current.isEmpty() || (!current.contains(street) && !isAdjacent(street, current))) {
                 List<BasicStreet> newCurrent = new ArrayList<>(current);
-                newCurrent.add(allStreets.get(i));
-                if (isStreetEffective(street, originalComponents)) {
-                    generateCombinations(allStreets, newCurrent, combinations, k, originalComponents);
+                newCurrent.add(street);
+                generateCombinations(allStreets, newCurrent, combinations, k, originalComponents);
+            }
+        }
+    }
+
+    private boolean isAdjacent(BasicStreet street, List<BasicStreet> current) {
+        for (BasicStreet s : current) {
+            if (areDirectNeighbors(street, s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean containsAdjacentNodes(List<BasicStreet> combination) {
+        for (int i = 0; i < combination.size(); i++) {
+            for (int j = i + 1; j < combination.size(); j++) {
+                if (areDirectNeighbors(combination.get(i), combination.get(j))) {
+                    return true;
                 }
             }
         }
+        return false;
+    }
+
+    private boolean areDirectNeighbors(BasicStreet s1, BasicStreet s2) {
+        // Check if two streets are directly adjacent
+        int rowDiff = Math.abs(s1.getPosition().getRow() - s2.getPosition().getRow());
+        int colDiff = Math.abs(s1.getPosition().getColumn() - s2.getPosition().getColumn());
+        return (rowDiff == 1 && colDiff == 0) || (rowDiff == 0 && colDiff == 1);
     }
 
 
     /**
      * Checks if replacing a given street node with a green space increases the number of components in the siteMap.
      *
-     * @param street the street node to be replaced
+     * @param street             the street node to be replaced
      * @param originalComponents the original number of components in the siteMap
      * @return true if replacing the street node increases the number of components, false otherwise
      */
@@ -308,7 +336,7 @@ public class SiteManager {
     /**
      * Checks if a combination of street nodes forms a valid cut set that increases the number of components in the siteMap.
      *
-     * @param combo the combination of street nodes
+     * @param combo              the combination of street nodes
      * @param originalComponents the original number of components in the siteMap
      * @return true if the combination forms a valid cut set, false otherwise
      */
@@ -372,7 +400,7 @@ public class SiteManager {
     /**
      * Performs a depth first search  to mark all reachable street nodes from a given starting vertex.
      *
-     * @param vertex the starting vertex
+     * @param vertex  the starting vertex
      * @param visited the set of already visited vertices
      */
     private void dfs(BasicVertex vertex, Set<BasicVertex> visited) {
@@ -385,7 +413,5 @@ public class SiteManager {
             }
         }
     }
-
-
 }
 
