@@ -74,7 +74,7 @@ public class DistanceTimeMap {
             }
         }
 
-        return Integer.MAX_VALUE; // If no path is found
+        return Integer.MAX_VALUE;
     }
 
     /**

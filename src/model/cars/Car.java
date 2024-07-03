@@ -33,6 +33,7 @@ public class Car {
      */
     private Position2D currentPos;
     private Position2D previousPos;
+    private int counter;
 
 
     /**
@@ -50,6 +51,7 @@ public class Car {
         this.currentPos = new Position2D(-1, -1);
         this.spawnPos = trip.getFirst();
         this.previousPos = new Position2D(-1, -1);
+        this.counter = -1;
     }
 
     /**
@@ -58,13 +60,22 @@ public class Car {
      * @param nextTimeStep the next time step to update to
      */
     public void update(int nextTimeStep) {
-        this.previousPos = this.currentPos;  // Store current position as previous
         this.currentTime = nextTimeStep;
 
-        if (currentTime >= spawnTime) {
-            int tripIndex = currentTime - spawnTime;
-            if (tripIndex < trip.size()) {
-                currentPos = trip.get(tripIndex);
+        if (currentTime == spawnTime) {
+            previousPos = currentPos;
+            this.counter++;
+            if (counter < trip.size()) {
+                currentPos = trip.get(counter);
+
+        }}
+
+        if (currentTime > spawnTime) {
+            this.counter++;
+            previousPos = trip.get(counter - 1);
+            System.out.println(counter);
+            if (counter < trip.size()) {
+                currentPos = trip.get(counter);
             } else {
                 currentPos = trip.getLast();
             }
@@ -75,14 +86,14 @@ public class Car {
      * Moves the car one step back on its trip
      * If the car is in its initial position or not yet spawned, it does not move
      */
+    //update counter immer hochsetzen
     public void onePositionBack() {
         if (currentTime > spawnTime) {
-            this.currentPos = this.previousPos;
-            int previousIndex = currentTime - spawnTime - 2;
-            if (previousIndex >= 0) {
-                this.previousPos = trip.get(previousIndex);
+            this.counter--;;
+            if (counter >= 0 && counter < trip.size()) {
+                currentPos = trip.get(counter);
             } else {
-                this.previousPos = new Position2D(-1, -1);
+                currentPos = new Position2D(-1, -1);
             }
         }
     }
@@ -171,5 +182,13 @@ public class Car {
 
     public void setPreviousPos(Position2D previousPos) {
         this.previousPos = previousPos;
+    }
+
+    public int getCounter() {
+        return counter;
+    }
+
+    public void setCounter(int counter) {
+        this.counter = counter;
     }
 }

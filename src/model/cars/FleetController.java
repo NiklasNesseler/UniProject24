@@ -76,7 +76,6 @@ public class FleetController {
         Car carToStay = carsAtPosition.getFirst();
         Position2D position = carToStay.getCurrentPos();
 
-        // Check if any car was already at this position in the previous time step
         for (Car car : carsAtPosition) {
             if (car.getPreviousPos().equals(position)) {
                 carToStay = car;
@@ -84,7 +83,6 @@ public class FleetController {
             }
         }
 
-        // If no car was at this position previously, choose the one with the lowest ID
         if (!carToStay.getPreviousPos().equals(position)) {
             for (Car car : carsAtPosition) {
                 if (car.getId() < carToStay.getId()) {
@@ -93,7 +91,6 @@ public class FleetController {
             }
         }
 
-        // Move back all cars except the one that stays
         for (Car car : carsAtPosition) {
             if (car != carToStay) {
                 car.onePositionBack();
