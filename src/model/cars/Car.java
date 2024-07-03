@@ -91,7 +91,6 @@ public class Car {
      * Moves the car one step back on its trip
      * If the car is in its initial position or not yet spawned, it does not move
      */
-    //update counter immer hochsetzen
     public void onePositionBack() {
         if (currentTime > spawnTime) {
             this.counter--;;

@@ -83,8 +83,62 @@ public class DistanceTimeMap {
      * @param end vertex
      * @return the temporal distance between 2 vertices
      */
+
     public int computeDuration(BasicVertex start, BasicVertex end) {
-        return bfs(start, end, false);
+        ArrayList<ArrayList<BasicVertex>> paths = getPath(start, end);
+
+        int duration = Integer.MAX_VALUE;
+        for (ArrayList<BasicVertex> path : paths) {
+            int tripDuration1 = computeDurationOfTrip(path);
+            if (duration > tripDuration1) {
+                duration = tripDuration1;
+            }
+        }
+        return duration;
+    }
+
+    public ArrayList<ArrayList<BasicVertex>> getPath(BasicVertex start, BasicVertex end) {
+        ArrayList<ArrayList<BasicVertex>> allPaths = new ArrayList<>();
+
+        if (start.getNeighbours().contains(end)) {
+            ArrayList<BasicVertex> directPath = new ArrayList<>();
+            directPath.add(start);
+            directPath.add(end);
+            allPaths.add(directPath);
+            return allPaths;
+        }
+
+        // If not direct neighbors, proceed with DFS
+        ArrayList<BasicVertex> currentPath = new ArrayList<>();
+        Set<BasicVertex> visited = new HashSet<>();
+        dfs(start, end, currentPath, visited, allPaths);
+
+
+        return allPaths;
+    }
+
+    private void dfs(BasicVertex current, BasicVertex end, ArrayList<BasicVertex> currentPath,
+                     Set<BasicVertex> visited, ArrayList<ArrayList<BasicVertex>> allPaths) {
+
+
+        currentPath.add(current);
+        visited.add(current);
+
+        if (current.equals(end)) {
+            if (sparseMap.isBasicPathOverStreets(currentPath)) {
+                allPaths.add(new ArrayList<>(currentPath));
+            }
+        } else {
+            for (BasicVertex neighbour : current.getNeighbours()) {
+                if (!visited.contains(neighbour)) {
+                        dfs(neighbour, end, currentPath, visited, allPaths);
+                    }
+                }
+            }
+
+
+        currentPath.removeLast();
+        visited.remove(current);
     }
 
     /**
@@ -97,7 +151,10 @@ public class DistanceTimeMap {
         for (int i = 0; i < vertexList.size() - 1; i++) {
             BasicVertex current = vertexList.get(i);
             BasicVertex next = vertexList.get(i + 1);
-            int duration = computeDuration(current, next);
+            //int duration = computeDuration(current, next);
+
+            int duration = grid.getDurations().get(current).get(next);
+
             if (duration == Integer.MAX_VALUE) {
                 return Integer.MAX_VALUE;
             }
@@ -106,49 +163,6 @@ public class DistanceTimeMap {
         return totalDuration;
     }
 
-
-    /**
-     * Performing a breadth first search to compute either the spatial or temporal distance between 2 vertices
-     * @param start starting vertex
-     * @param end ending vertex
-     * @param isDistance true to compute spatial distance, false to compute temporal distance
-     * @return the computed distance or duration between the start and end vertices
-     */
-    private int bfs(BasicVertex start, BasicVertex end, boolean isDistance) {
-        if (!sparseMap.areStreetConnected(start, end)) {
-            return Integer.MAX_VALUE;
-        }
-        Queue<BasicVertex> queue = new LinkedList<>();
-        Map<BasicVertex, Integer> distances = new HashMap<>();
-        Set<BasicVertex> visited = new HashSet<>();
-
-        queue.offer(start);
-        distances.put(start, 0);
-
-        while (!queue.isEmpty()) {
-            BasicVertex current = queue.poll();
-            visited.add(current);
-
-            for (BasicVertex neighbour : current.getNeighbours()) {
-                if (!current.equals(start) && !neighbour.equals(end) && !(neighbour instanceof BasicStreet)) {
-                    continue;
-                }
-                int weight = isDistance ?
-                        grid.getDistances().get(current).get(neighbour) : grid.getDurations().get(current).get(neighbour);
-
-                if (weight == Integer.MAX_VALUE) {
-                    continue;
-                }
-
-                int newDistance = distances.get(current) + weight;
-                if (!distances.containsKey(neighbour) || newDistance < distances.get(neighbour)) {
-                    distances.put(neighbour, newDistance);
-                    queue.offer(neighbour);
-                }
-            }
-        }
-        return distances.getOrDefault(end, Integer.MAX_VALUE);
-    }
 
 
     /**
