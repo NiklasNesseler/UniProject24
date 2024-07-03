@@ -84,16 +84,20 @@ public class FleetController {
         }
 
         if (!carToStay.getPreviousPos().equals(position)) {
-            for (Car car : carsAtPosition) {
-                if (car.getId() < carToStay.getId()) {
-                    carToStay = car;
-                }
+                carToStay = Collections.min(carsAtPosition, Comparator.comparingInt(Car::getId));
+
             }
-        }
+
 
         for (Car car : carsAtPosition) {
             if (car != carToStay) {
-                car.onePositionBack();
+                if (car.getCurrentTime() == car.getSpawnTime()) {
+                    car.setCurrentPos(new Position2D(-1, -1));
+                    car.setPreviousPos(new Position2D(-1, -1));
+                    car.setCounter(-1);
+                } else {
+                    car.onePositionBack();
+                }
             }
         }
     }

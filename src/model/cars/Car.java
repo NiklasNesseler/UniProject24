@@ -67,19 +67,24 @@ public class Car {
             this.counter++;
             if (counter < trip.size()) {
                 currentPos = trip.get(counter);
-
-        }}
-
-        if (currentTime > spawnTime) {
+            }
+        } else if (currentTime > spawnTime) {
             this.counter++;
-            previousPos = trip.get(counter - 1);
-            System.out.println(counter);
+            previousPos = counter > 0 ? trip.get(counter - 1) : new Position2D(-1, -1);
             if (counter < trip.size()) {
                 currentPos = trip.get(counter);
             } else {
                 currentPos = trip.getLast();
             }
+        } else {
+            resetToPreSpawn();
         }
+    }
+
+    private void resetToPreSpawn() {
+        this.currentPos = new Position2D(-1, -1);
+        this.previousPos = new Position2D(-1, -1);
+        this.counter = -1;
     }
 
     /**
