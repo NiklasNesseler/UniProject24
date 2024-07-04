@@ -43,7 +43,7 @@ public class AdvancedStreet extends AdvancedVertex {
      * Initializes the parts array based on the type of the street
      * @param type type of the street
      */
-    void initParts(StreetTypes type) {
+    public void initParts(StreetTypes type) {
         switch (type) {
             case DUMMY:
                 setParts(new boolean[][] {
