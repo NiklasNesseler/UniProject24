@@ -104,16 +104,13 @@ public class DistanceDurationGrid {
      * @return the temporal distance as an int
      */
     int temporalDistance(BasicVertex a, BasicVertex b) {
-        //Fall a
         if (a.equals(b)) {
             return 0;
         }
-        //Fall b
         if (!(a instanceof BasicStreet) || !(b instanceof BasicStreet)) {
             return 5;
         }
 
-        //Fall d
         int sa = ((BasicStreet) a).getSpeedLimit();
         int sb = ((BasicStreet) b).getSpeedLimit();
         // fall c

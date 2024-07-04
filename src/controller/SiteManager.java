@@ -158,10 +158,18 @@ public class SiteManager {
         return components;
     }
 
+    /**
+     * Gets the Site Map managed by this Sitemanager
+     * @return the sparse map
+     */
     public SparseMap getSiteMap() {
         return siteMap;
     }
 
+    /**
+     * sets a new sparse map for the site manager
+     * @param siteMap the new sparse map
+     */
     public void setSiteMap(SparseMap siteMap) {
         this.siteMap = siteMap;
     }
@@ -252,6 +260,10 @@ public class SiteManager {
         return minLexiSet.toArray(new BasicStreet[0]);
     }
 
+    /**
+     * Gets all street vertices from the map
+     * @return a list of all street objects
+     */
     private List<BasicStreet> getAllStreets() {
         List<BasicStreet> streets = new ArrayList<>();
         for (BasicVertex[] row : siteMap.getSparseVertexArray()) {
@@ -290,6 +302,12 @@ public class SiteManager {
         }
     }
 
+    /**
+     * Checks if a street is adjacent to any street in the current list
+     * @param street street to check
+     * @param current current streets
+     * @return true if the street is adjacent to any street in the current list, false otherwise
+     */
     private boolean isAdjacent(BasicStreet street, List<BasicStreet> current) {
         for (BasicStreet s : current) {
             if (areDirectNeighbours(street, s)) {
@@ -299,6 +317,11 @@ public class SiteManager {
         return false;
     }
 
+    /**
+     * Checks if the given combination of streets contains any adjacent nodes
+     * @param combination combination of streets to check
+     * @return true if the combination contains adjacent nodes, false otherwise
+     */
     private boolean containsAdjacentNodes(List<BasicStreet> combination) {
         for (int i = 0; i < combination.size(); i++) {
             for (int j = i + 1; j < combination.size(); j++) {
@@ -310,6 +333,12 @@ public class SiteManager {
         return false;
     }
 
+    /**
+     * Checks if 2 street vertices are directly adjacent
+     * @param s1 street 1
+     * @param s2 street 2
+     * @return true if the streets are adjacent, false otherwise
+     */
     private boolean areDirectNeighbours(BasicStreet s1, BasicStreet s2) {
         // Check if two streets are directly adjacent
         int rowDiff = Math.abs(s1.getPosition().getRow() - s2.getPosition().getRow());

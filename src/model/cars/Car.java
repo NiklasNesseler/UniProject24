@@ -81,6 +81,9 @@ public class Car {
         }
     }
 
+    /**
+     * Method accounting for if two cars meet immediately after spawning
+     */
     private void resetToPreSpawn() {
         this.currentPos = new Position2D(-1, -1);
         this.previousPos = new Position2D(-1, -1);

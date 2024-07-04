@@ -97,6 +97,13 @@ public class DistanceTimeMap {
         return duration;
     }
 
+    /**
+     * Getting every possible path between start and end and filtering out all of those, that are not connected by streets
+     * using a dfs
+     * @param start start vertex
+     * @param end end vertex
+     * @return all possible paths
+     */
     public ArrayList<ArrayList<BasicVertex>> getPath(BasicVertex start, BasicVertex end) {
         ArrayList<ArrayList<BasicVertex>> allPaths = new ArrayList<>();
 
@@ -108,7 +115,6 @@ public class DistanceTimeMap {
             return allPaths;
         }
 
-        // If not direct neighbors, proceed with DFS
         ArrayList<BasicVertex> currentPath = new ArrayList<>();
         Set<BasicVertex> visited = new HashSet<>();
         dfs(start, end, currentPath, visited, allPaths);
