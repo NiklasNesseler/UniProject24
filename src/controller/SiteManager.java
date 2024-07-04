@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * Class to manage Construction Sites in the SparseMap
  */
 public class SiteManager {
-    SparseMap siteMap;
+    private SparseMap siteMap;
 
     public SiteManager(SparseMap siteMap) {
         this.siteMap = siteMap;
@@ -72,7 +72,7 @@ public class SiteManager {
      *
      * @return the number of components
      */
-    int countComponents() {
+    public int countComponents() {
         Set<BasicVertex> visited = new HashSet<>();
         int components = 0;
 
@@ -141,7 +141,7 @@ public class SiteManager {
      *
      * @return all the components
      */
-    List<List<BasicVertex>> getComponents() {
+    public List<List<BasicVertex>> getComponents() {
         Set<BasicVertex> visited = new HashSet<>();
         List<List<BasicVertex>> components = new ArrayList<>();
 
@@ -408,7 +408,7 @@ public class SiteManager {
      *
      * @return the number of connected components
      */
-    int countComponents2() {
+    private int countComponents2() {
         Set<BasicVertex> visited = new HashSet<>();
         int components = 0;
 

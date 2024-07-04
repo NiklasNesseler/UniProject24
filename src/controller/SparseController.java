@@ -30,7 +30,7 @@ public class SparseController {
      * @param baseData represents the base data for the map
      * @param valueData represents the value data for the map
      */
-    private void initCompleteSparseMap(int[][] baseData, int[][] valueData) {
+    public void initCompleteSparseMap(int[][] baseData, int[][] valueData) {
         completeSparseMap = new SparseMap(baseData);
         completeSparseMap.putValuesToBasicMap(valueData);
 

@@ -45,7 +45,7 @@ public class TimeStepper {
     /**
      * Notifies the cars to update to the current time step
      */
-    void updateSubscribers() {
+    public void updateSubscribers() {
         for (Car car : subscribers) {
             car.update(timeStep);
         }

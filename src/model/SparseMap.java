@@ -30,7 +30,7 @@ public class SparseMap extends BasicMap implements DensityChecker {
     /**
      * Initializes the sparse vertex array with the vertex array from the superclass.
      */
-    private void initSparseVertexArray() {
+    public void initSparseVertexArray() {
         sparseVertexArray = getVertexArray();
     }
 
