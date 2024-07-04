@@ -22,8 +22,8 @@ public class AdvancedGreen extends AdvancedVertex{
      * Initializes the parts representing a green
      */
     @Override
-    void initParts() {
-        for (boolean[] part : parts) {
+    public void initParts() {
+        for (boolean[] part : getParts()) {
             Arrays.fill(part, false);
         }
     }

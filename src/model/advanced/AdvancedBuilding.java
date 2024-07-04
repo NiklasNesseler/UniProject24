@@ -23,8 +23,8 @@ public class AdvancedBuilding extends AdvancedVertex {
      * Initializes the parts representing a building
      */
     @Override
-    void initParts() {
-        for (boolean[] part : parts) {
+    public void initParts() {
+        for (boolean[] part : getParts()) {
             Arrays.fill(part, true);
         }
     }

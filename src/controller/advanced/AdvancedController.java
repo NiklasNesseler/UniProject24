@@ -11,7 +11,7 @@ import model.advanced.AdvancedMap;
 
 public class AdvancedController {
     /** The AdvancedMap object managed by this controller. */
-    AdvancedMap advancedMap;
+    private AdvancedMap advancedMap;
 
     /**
      * Constructs an AdvancedController with the specified base data, value data, and street codes.
@@ -39,7 +39,7 @@ public class AdvancedController {
      * @param streetCodes a 2D array representing the street codes for the map
      */
 
-    void initAdvancedMap(int[][] baseData, int[][] valueData, int[][] streetCodes) {
+    public void initAdvancedMap(int[][] baseData, int[][] valueData, int[][] streetCodes) {
         BasicController basicController = new BasicController(baseData, valueData);
         this.advancedMap = new AdvancedMap(basicController.getCompleteBasicMap());
         this.advancedMap.buildAdvancedStreets(streetCodes);

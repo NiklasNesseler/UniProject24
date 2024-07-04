@@ -6,7 +6,7 @@ import model.BasicVertex;
 import java.util.*;
 
 public class AdvancedVertex extends BasicVertex {
-    boolean[][] parts;
+    private boolean[][] parts;
     private AdvancedMap containingAdvancedMap;
     
     public AdvancedVertex(int row, int column, int value) {
@@ -17,7 +17,7 @@ public class AdvancedVertex extends BasicVertex {
 
 
 
-    void initParts() {
+    public void initParts() {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 parts[i][j] = (i == 1 && j == 1);

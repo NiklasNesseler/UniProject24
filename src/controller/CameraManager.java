@@ -84,7 +84,7 @@ public class CameraManager {
      * @return true if all streets are covered by the cameras, false otherwise
      * @throws IllegalArgumentException if observedMap or cameras is null
      */
-    boolean isCameraCover(ArrayList<Camera> cameras) {
+    public boolean isCameraCover(ArrayList<Camera> cameras) {
         if (observedMap == null || cameras == null) {
             throw new IllegalArgumentException("observedMap and cameras cannot be null");
         }

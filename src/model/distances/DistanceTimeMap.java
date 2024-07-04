@@ -33,7 +33,7 @@ public class DistanceTimeMap {
     /**
      * Initializes the grid with a new distance duration grid based on the sparse map
      */
-    void initGrid() {
+    public void initGrid() {
         this.grid = new DistanceDurationGrid(sparseMap);
     }
 
@@ -104,7 +104,7 @@ public class DistanceTimeMap {
      * @param end end vertex
      * @return all possible paths
      */
-    public ArrayList<ArrayList<BasicVertex>> getPath(BasicVertex start, BasicVertex end) {
+    private ArrayList<ArrayList<BasicVertex>> getPath(BasicVertex start, BasicVertex end) {
         ArrayList<ArrayList<BasicVertex>> allPaths = new ArrayList<>();
 
         if (start.getNeighbours().contains(end)) {

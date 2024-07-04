@@ -16,6 +16,6 @@ public interface DensityChecker {
      * Checks a Square or SparseMap for Density Requirements
      * @return true if Requirements are met, false otherwise
      */
-    boolean isSparse();
+    public boolean isSparse();
 
 }

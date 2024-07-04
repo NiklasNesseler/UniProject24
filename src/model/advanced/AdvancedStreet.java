@@ -46,46 +46,41 @@ public class AdvancedStreet extends AdvancedVertex {
     void initParts(StreetTypes type) {
         switch (type) {
             case DUMMY:
-                parts = new boolean[][] {
+                setParts(new boolean[][] {
                         {false, false, false},
                         {false, true, false},
-                        {false, false, false}
-                };
+                        {false, false, false}});
                 break;
             case CROSSING:
-                parts = new boolean[][] {
+                setParts(new boolean[][] {
                         {false, true, false},
                         {true, true, true},
-                        {false, true, false}
-                };
+                        {false, true, false}});
                 break;
             case TJUNCTION:
-                parts = new boolean[][] {
+                setParts(new boolean[][] {
                         {false, false, false},
                         {true, true, true},
-                        {false, true, false}
-                };
+                        {false, true, false}});
                 break;
             case LINE:
-                parts = new boolean[][] {
+                setParts(new boolean[][] {
                         {false, false, false},
                         {true, true, true},
-                        {false, false, false}
-                };
+                        {false, false, false}});
                 break;
             case CURVE:
-                parts = new boolean[][] {
+                setParts(new boolean[][] {
                         {false, true, false},
                         {true, true, false},
-                        {false, false, false}
-                };
+                        {false, false, false}});
                 break;
             case NEEDLE:
-                parts = new boolean[][] {
+                setParts(new boolean[][] {
                         {false, false, false},
                         {true, true, false},
                         {false, false, false}
-                };
+                });
                 break;
         }
     }

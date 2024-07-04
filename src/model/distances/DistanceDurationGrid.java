@@ -38,7 +38,7 @@ public class DistanceDurationGrid {
     /**
      * Initializes the map with the temporal distances
      */
-    void initDurations() {
+    public void initDurations() {
         BasicVertex[][] vertexArray = sparseMap.getSparseVertexArray();
 
         for (BasicVertex[] row : vertexArray) {
@@ -56,7 +56,7 @@ public class DistanceDurationGrid {
     /**
      * Initializes the spatial distances between vertices
      */
-    void initDistances() {
+    public void initDistances() {
         BasicVertex[][] vertexArray = sparseMap.getSparseVertexArray();
         for (BasicVertex[] row : vertexArray) {
             for (BasicVertex vertex : row) {
@@ -103,7 +103,7 @@ public class DistanceDurationGrid {
      * @param b vertice b
      * @return the temporal distance as an int
      */
-    int temporalDistance(BasicVertex a, BasicVertex b) {
+    private int temporalDistance(BasicVertex a, BasicVertex b) {
         if (a.equals(b)) {
             return 0;
         }

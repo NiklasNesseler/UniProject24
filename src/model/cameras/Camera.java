@@ -47,7 +47,7 @@ public class Camera {
      * The vertices are added to the list if they are within the camera's range and visible.
      * The list is sorted by the value of the vertices.
      */
-    void initObservedVertices() {
+    public void initObservedVertices() {
         BasicVertex[][] vertexArray = observedMap.getSparseVertexArray();
         BasicVertex cameraVertex = vertexArray[position.getRow()][position.getColumn()];
 
