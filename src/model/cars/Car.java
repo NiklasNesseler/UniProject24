@@ -45,7 +45,7 @@ public class Car {
      */
     public Car(int id, ArrayList<Position2D> trip, int spawnTime) {
         this.id = id;
-        this.trip = new ArrayList<>(trip);
+        this.trip = trip;
         this.spawnTime = spawnTime;
         this.currentTime = 0;
         this.currentPos = new Position2D(-1, -1);
