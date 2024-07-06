@@ -119,7 +119,7 @@ public class AdvancedMap{
                 return false;
             }
 
-            //Hier auch DUMMY verboten?
+
             if (current.getType().equals(AdvancedStreet.StreetTypes.CROSSING) || current.getType().equals(AdvancedStreet.StreetTypes.TJUNCTION)
             || current.getType().equals(AdvancedStreet.StreetTypes.DUMMY)) {
                 return false;
@@ -288,18 +288,16 @@ public class AdvancedMap{
             }
         }
 
-        //1
         if (streets.size() < 2) {
             return false;
         }
-        //2
+
         for (AdvancedStreet street : streets) {
             if (street.getType().equals(AdvancedStreet.StreetTypes.DUMMY))
 
                 return false;
         }
 
-        //3 und 4
         for (AdvancedStreet street : streets) {
             boolean neighbourFound = false;
             for (AdvancedStreet neighbour : getAdvancedStreetNeighbours(street)) {

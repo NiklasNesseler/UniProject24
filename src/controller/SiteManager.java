@@ -62,7 +62,6 @@ public class SiteManager {
         int newComponents = countComponents();
 
 
-        //Fragt mich nicht warum aber das funktioniert
         return newComponents < initialComponents;
     }
 
@@ -147,8 +146,8 @@ public class SiteManager {
 
         for (BasicVertex[] row : siteMap.getSparseVertexArray()) {
             for (BasicVertex v : row) {
-                //TODO: das ungleich null unbedingt noch in > 0 ändern
-                if (v instanceof BasicStreet && ((BasicStreet) v).getSpeedLimit() != 0 && !visited.contains(v)) {
+
+                if (v instanceof BasicStreet && ((BasicStreet) v).getSpeedLimit() > 0 && !visited.contains(v)) {
                     List<BasicVertex> newComponent = new ArrayList<>();
                     dfs(v, visited, newComponent);
                     components.add(newComponent);
@@ -340,7 +339,6 @@ public class SiteManager {
      * @return true if the streets are adjacent, false otherwise
      */
     private boolean areDirectNeighbours(BasicStreet s1, BasicStreet s2) {
-        // Check if two streets are directly adjacent
         int rowDiff = Math.abs(s1.getPosition().getRow() - s2.getPosition().getRow());
         int colDiff = Math.abs(s1.getPosition().getColumn() - s2.getPosition().getColumn());
         return (rowDiff == 1 && colDiff == 0) || (rowDiff == 0 && colDiff == 1);
@@ -370,7 +368,6 @@ public class SiteManager {
      * @return true if the combination forms a valid cut set, false otherwise
      */
     private boolean isValidCutSet(List<BasicStreet> combo, int originalComponents) {
-        // Temporarily replace streets with greens
         Map<BasicStreet, BasicVertex> originalVertices = new HashMap<>();
         for (BasicStreet street : combo) {
             originalVertices.put(street, siteMap.getBasicVertex(street.getPosition()).orElse(null));

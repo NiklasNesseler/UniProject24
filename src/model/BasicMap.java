@@ -26,7 +26,7 @@ public class BasicMap extends BasicMapTemplate {
 
     @Override
     public void initVertexArray(int[][] baseData) {
-        //8.3 a)
+
         BasicVertex[][] vertexArray;
         vertexArray = new BasicVertex[baseData.length][baseData[0].length];
         for (int i = 0; i < baseData.length; i++) {
@@ -207,7 +207,7 @@ public class BasicMap extends BasicMapTemplate {
             stack.push(verticesWithValue.getFirst());
             visited.add(verticesWithValue.getFirst());
 
-            //DFS
+
             while (!stack.isEmpty()) {
                 BasicVertex current = stack.pop();
 

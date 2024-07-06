@@ -157,7 +157,6 @@ public class DistanceTimeMap {
         for (int i = 0; i < vertexList.size() - 1; i++) {
             BasicVertex current = vertexList.get(i);
             BasicVertex next = vertexList.get(i + 1);
-            //int duration = computeDuration(current, next);
 
             int duration = grid.getDurations().get(current).get(next);
 

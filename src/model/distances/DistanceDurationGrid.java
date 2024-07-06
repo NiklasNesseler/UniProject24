@@ -113,7 +113,7 @@ public class DistanceDurationGrid {
 
         int sa = ((BasicStreet) a).getSpeedLimit();
         int sb = ((BasicStreet) b).getSpeedLimit();
-        // fall c
+
         if (sa == 0 || sb == 0) {
             return Integer.MAX_VALUE;
         }
