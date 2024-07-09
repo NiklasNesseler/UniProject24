@@ -98,13 +98,13 @@ public class Square implements DensityChecker, Comparable<Square> {
     /**
      * Compares this square with another square based on the number of street vertices and anchor point values.
      *
-     * @param o the other square to compare with
+     * @param otherSquare the other square to compare with
      * @return -1 if this square is less than the other square, 1 if greater, 0 if equal
      */
     @Override
-    public int compareTo(Square o) {
+    public int compareTo(Square otherSquare) {
         int street1 = countStreetVertices();
-        int street2 = o.countStreetVertices();
+        int street2 = otherSquare.countStreetVertices();
 
         if (street1 < street2) {
             return -1;
@@ -113,7 +113,7 @@ public class Square implements DensityChecker, Comparable<Square> {
 
         } else {
             int value1 = squareMembers[0].getValue();
-            int value2 = o.squareMembers[0].getValue();
+            int value2 = otherSquare.squareMembers[0].getValue();
             return Integer.compare(value1, value2);
         }
     }

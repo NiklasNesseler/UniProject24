@@ -42,7 +42,7 @@ public class SiteManager {
      * @param positionList list of vertices to be replaced
      * @return true if components go up by at least 1 when vertices get replaced
      */
-    public boolean isDisconnectedSet(ArrayList<Position2D> positionList) {
+    public boolean isDisconnectingSet(ArrayList<Position2D> positionList) {
         Map<Position2D, BasicVertex> originalVertices = new HashMap<>();
         for (Position2D position : positionList) {
             Optional<BasicVertex> vertex = siteMap.getBasicVertex(position);
@@ -67,7 +67,7 @@ public class SiteManager {
 
 
     /**
-     * Helper method for isDisconnectedSet
+     * Helper method for isDisconnectingSet
      *
      * @return the number of components
      */
